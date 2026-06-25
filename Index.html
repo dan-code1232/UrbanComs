@@ -1,0 +1,2210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Urbancoms — Connected by Light</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,700&family=Manrope:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config={theme:{extend:{colors:{cream:'var(--color-cream)',navy:'var(--color-navy)',lime:'var(--color-lime)',muted:'var(--color-muted)',light:'var(--color-light)'},fontFamily:{serif:['"Playfair Display"','Georgia','serif'],sans:['Manrope','Inter','sans-serif'],mono:['"JetBrains Mono"','monospace']}}}}
+  </script>
+  <style>
+    /* ============================================================
+       URBANCOMS — CSS DESIGN SYSTEM
+       Organised into clear layers: tokens → base → layout →
+       background → cursor → lighting → components → animations
+       ============================================================ */
+
+    /* -------- 1. DESIGN TOKENS -------------------------------- */
+    :root{
+      /* Brand palette */
+      --color-cream:#F5F0EB;
+      --color-cream-soft:#FBF7F3;
+      --color-navy:#0B1426;
+      --color-navy-soft:#161F36;
+      --color-lime:#C8FF00;
+      --color-lime-soft:#DFFA66;
+      --color-muted:#8B8680;
+      --color-light:#C4BEB8;
+
+      /* Derived semantic tokens */
+      --color-text:var(--color-navy);
+      --color-text-muted:var(--color-muted);
+      --color-surface:#FFFFFF;
+      --color-surface-soft:var(--color-cream);
+      --color-bg:var(--color-cream);
+      --color-border:rgba(11,20,38,.07);
+      --color-border-strong:rgba(11,20,38,.14);
+      --color-border-lime:rgba(200,255,0,.32);
+
+      /* Typography */
+      --font-serif:'Playfair Display',Georgia,serif;
+      --font-sans:'Manrope','Inter',system-ui,sans-serif;
+      --font-mono:'JetBrains Mono',monospace;
+
+      /* Fluid type scale */
+      --text-xs:.6875rem;
+      --text-sm:.8125rem;
+      --text-base:.9375rem;
+      --text-md:1rem;
+      --text-lg:1.125rem;
+      --text-xl:clamp(1.25rem,1.6vw,1.5rem);
+      --text-2xl:clamp(1.5rem,2.4vw,2rem);
+      --text-3xl:clamp(2rem,3.5vw,3rem);
+      --text-4xl:clamp(2.5rem,5vw,4rem);
+      --text-display:clamp(3rem,9vw,8.5rem);
+
+      /* Spacing scale */
+      --space-xs:.5rem;
+      --space-sm:.75rem;
+      --space-md:1rem;
+      --space-lg:1.5rem;
+      --space-xl:2.5rem;
+      --space-2xl:4rem;
+      --space-3xl:6rem;
+      --space-4xl:8rem;
+
+      /* Layout */
+      --sidebar-w:240px;
+      --sidebar-w-md:200px;
+      --content-pad-x:clamp(1.25rem,4.5vw,4rem);
+      --content-max:80rem;
+
+      /* Radius */
+      --radius-sm:.5rem;
+      --radius-md:.875rem;
+      --radius-lg:1.25rem;
+      --radius-xl:1.75rem;
+      --radius-2xl:2rem;
+      --radius-full:9999px;
+
+      /* Shadows */
+      --shadow-xs:0 1px 2px rgba(11,20,38,.04);
+      --shadow-sm:0 2px 8px rgba(11,20,38,.05),0 1px 2px rgba(11,20,38,.03);
+      --shadow-md:0 12px 32px -8px rgba(11,20,38,.10),0 4px 10px -4px rgba(11,20,38,.05);
+      --shadow-lg:0 30px 70px -20px rgba(11,20,38,.20),0 12px 24px -10px rgba(11,20,38,.07);
+      --shadow-lime:0 18px 40px -12px rgba(200,255,0,.40);
+      --shadow-glow-lime:0 0 24px rgba(200,255,0,.35),0 0 60px rgba(200,255,0,.15);
+
+      /* Motion */
+      --ease-out:cubic-bezier(.16,1,.3,1);
+      --ease-spring:cubic-bezier(.34,1.4,.64,1);
+      --ease-smooth:cubic-bezier(.4,0,.2,1);
+      --ease-soft:cubic-bezier(.25,.46,.45,.94);
+      --dur-fast:.18s;
+      --dur-base:.35s;
+      --dur-slow:.7s;
+      --dur-reveal:.95s;
+
+      /* Z-index */
+      --z-bg:0;
+      --z-content:1;
+      --z-elevated:10;
+      --z-overlay:60;
+      --z-toast:200;
+      --z-cursor:9990;
+    }
+
+    /* -------- 2. BASE ----------------------------------------- */
+    *{box-sizing:border-box}
+    html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
+    body{
+      background:var(--color-bg);
+      color:var(--color-text);
+      font-family:var(--font-sans);
+      font-size:var(--text-base);
+      line-height:1.6;
+      letter-spacing:-.005em;
+      overflow:hidden;
+      height:100vh;
+      cursor:none;
+      margin:0;
+    }
+    h1,h2,h3,h4{font-feature-settings:"ss01","ss02";text-wrap:balance}
+    p{text-wrap:pretty}
+    ::-webkit-scrollbar{width:0;height:0}
+    @media(pointer:coarse){.cur-dot,.cur-ring{display:none!important}}
+
+    /* -------- 3. LAYOUT --------------------------------------- */
+    .app{display:flex;height:100vh;position:relative;z-index:var(--z-content)}
+    .sidebar{
+      width:var(--sidebar-w);
+      flex-shrink:0;
+      display:flex;
+      flex-direction:column;
+      background:rgba(255,255,255,.92);
+      backdrop-filter:blur(20px);
+      -webkit-backdrop-filter:blur(20px);
+      border-right:1px solid var(--color-border);
+      position:relative;
+      z-index:var(--z-elevated);
+    }
+    .cw{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+    .mhead{display:none;flex-shrink:0;background:rgba(255,255,255,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--color-border)}
+    .main{
+      flex:1;
+      overflow-y:auto;
+      overflow-x:hidden;
+      background:transparent;
+      position:relative;
+      scroll-behavior:auto;
+    }
+    .page{display:none;position:relative}
+    .page.active{display:block}
+    @media(max-width:767px){
+      .sidebar{display:none!important}
+      .mhead{display:flex!important;flex-direction:column}
+      .scroll-rail{display:none!important}
+    }
+    @media(min-width:768px)and(max-width:1023px){.sidebar{width:var(--sidebar-w-md)}}
+
+    /* -------- 4. BACKGROUND CANVAS ---------------------------- */
+    .bg-canvas{
+      position:fixed;
+      inset:0;
+      width:100%;height:100%;
+      pointer-events:none;
+      z-index:var(--z-bg);
+      opacity:1;
+    }
+    @media(max-width:767px){.bg-canvas{opacity:.85}}
+    @media(prefers-reduced-motion:reduce){.bg-canvas{display:none}}
+
+    /* Subtle grain overlay */
+    body::after{
+      content:'';
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      z-index:9990;
+      opacity:.022;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-repeat:repeat;
+      background-size:128px 128px;
+    }
+    .dot-bg{
+      background-image:radial-gradient(rgba(11,20,38,.045) 1px,transparent 1px);
+      background-size:24px 24px;
+    }
+
+    /* -------- 5. FAKE LIGHTING OVERLAYS ----------------------- */
+    /* Ambient light blooms that live behind content sections */
+    .light-bloom{
+      position:absolute;
+      border-radius:50%;
+      filter:blur(80px);
+      pointer-events:none;
+      mix-blend-mode:screen;
+      opacity:.55;
+      z-index:0;
+    }
+    .light-bloom.lime{background:radial-gradient(circle,rgba(200,255,0,.5),transparent 70%)}
+    .light-bloom.warm{background:radial-gradient(circle,rgba(255,210,150,.4),transparent 70%)}
+    .light-bloom.cool{background:radial-gradient(circle,rgba(150,200,255,.35),transparent 70%)}
+    .light-bloom.dark{background:radial-gradient(circle,rgba(11,20,38,.4),transparent 70%);mix-blend-mode:multiply;opacity:.4}
+
+    /* Cursor-following spotlight — REMOVED for performance (blur + mix-blend-mode:screen was expensive) */
+
+    /* -------- 6. CUSTOM CURSOR -------------------------------- */
+    .cur-dot{
+      position:fixed;
+      top:0;left:0;
+      width:10px;height:10px;
+      border-radius:50%;
+      background:var(--color-lime);
+      pointer-events:none;
+      z-index:var(--z-cursor);
+      mix-blend-mode:normal;
+      box-shadow:0 0 12px rgba(200,255,0,.9),0 0 28px rgba(200,255,0,.5),0 0 50px rgba(200,255,0,.2);
+      transition:width var(--dur-base),height var(--dur-base),background var(--dur-base),box-shadow var(--dur-base);
+      will-change:transform;
+    }
+    .cur-ring{
+      position:fixed;
+      top:0;left:0;
+      width:46px;height:46px;
+      border-radius:50%;
+      border:1.5px solid rgba(200,255,0,.55);
+      pointer-events:none;
+      z-index:calc(var(--z-cursor) - 1);
+      box-shadow:0 0 24px rgba(200,255,0,.18),inset 0 0 12px rgba(200,255,0,.12);
+      transition:width var(--dur-slow) var(--ease-out),height var(--dur-slow) var(--ease-out),border-color var(--dur-base),box-shadow var(--dur-base);
+      will-change:transform;
+    }
+    /* cur-glow — simplified: no blur, no mix-blend-mode. Just a radial
+       gradient with soft falloff that translates with the cursor.
+       GPU-composited (translate3d only) and very cheap. */
+    .cur-glow{
+      position:fixed;
+      top:0;left:0;
+      width:160px;height:160px;
+      border-radius:50%;
+      background:radial-gradient(circle,rgba(200,255,0,.14) 0%,rgba(200,255,0,.05) 35%,transparent 70%);
+      pointer-events:none;
+      z-index:calc(var(--z-cursor) - 2);
+      will-change:transform;
+      transition:width var(--dur-base),height var(--dur-base);
+    }
+    .cur-glow.h{width:240px;height:240px}
+    .cur-dot.h{width:5px;height:5px;box-shadow:0 0 16px rgba(200,255,0,1),0 0 40px rgba(200,255,0,.7),0 0 80px rgba(200,255,0,.3)}
+    .cur-ring.h{width:72px;height:72px;border-color:rgba(200,255,0,.9);box-shadow:0 0 36px rgba(200,255,0,.35),inset 0 0 18px rgba(200,255,0,.22)}
+
+    /* -------- 7. LOGO ----------------------------------------- */
+    .logo-mark{width:32px;height:32px;position:relative;display:flex;align-items:center;justify-content:center}
+    .logo-u{width:16px;height:16px;border:2.5px solid var(--color-navy);border-top:none;border-radius:0 0 9px 9px;position:relative;transition:border-color var(--dur-base)}
+    .logo-u::before,.logo-u::after{content:'';position:absolute;border:2px solid var(--color-lime);border-radius:50%;border-left-color:transparent;border-bottom-color:transparent;right:-7px;top:-4px}
+    .logo-u::before{width:10px;height:10px;transform:rotate(45deg)}
+    .logo-u::after{width:16px;height:16px;right:-12px;top:-8px;opacity:.35}
+    .logo-mark:hover .logo-u{border-color:var(--color-lime)}
+    .logo-link{transition:transform var(--dur-base)}
+    .logo-link:hover{transform:scale(1.05)}
+
+    /* -------- 8. SCROLL RAIL (right side, refined) ------------ */
+    .scroll-rail{
+      position:fixed;
+      right:28px;top:50%;
+      transform:translateY(-50%);
+      width:3px;height:200px;
+      z-index:var(--z-overlay);
+      pointer-events:none;
+    }
+    .sr-track{
+      position:absolute;inset:0;
+      background:rgba(11,20,38,.07);
+      border-radius:3px;
+      overflow:hidden;
+    }
+    .sr-fill{
+      position:absolute;top:0;left:0;width:100%;
+      background:linear-gradient(to bottom,rgba(200,255,0,.4),var(--color-lime));
+      border-radius:3px;
+      box-shadow:0 0 12px rgba(200,255,0,.6),0 0 28px rgba(200,255,0,.25);
+      transition:height .12s ease-out;
+    }
+    .sr-dot{
+      position:absolute;left:50%;
+      width:12px;height:12px;
+      border-radius:50%;
+      background:var(--color-lime);
+      transform:translate(-50%,-50%);
+      box-shadow:0 0 12px rgba(200,255,0,.7),0 0 28px rgba(200,255,0,.4),0 0 50px rgba(200,255,0,.15);
+      transition:top .12s ease-out;
+    }
+    .sr-tick{
+      position:absolute;left:50%;
+      transform:translateX(-50%);
+      width:4px;height:4px;
+      border-radius:50%;
+      background:rgba(11,20,38,.10);
+      transition:background var(--dur-slow),box-shadow var(--dur-slow),transform var(--dur-slow);
+    }
+    .sr-tick.lit{background:var(--color-lime);transform:translateX(-50%) scale(1.6);box-shadow:0 0 10px rgba(200,255,0,.7)}
+
+    /* -------- 9. TABS ----------------------------------------- */
+    .tab-ind{position:absolute;left:0;width:3px;background:var(--color-lime);border-radius:0 3px 3px 0;transition:top .45s var(--ease-out),height var(--dur-base) var(--ease-out);box-shadow:0 0 12px rgba(200,255,0,.5)}
+    .stab{display:flex;align-items:center;gap:12px;padding:11px 20px;width:100%;text-align:left;background:none;border:none;cursor:none;position:relative;transition:all var(--dur-base)}
+    .stab .tn{font-family:var(--font-mono);font-size:var(--text-xs);font-weight:500;color:var(--color-light);transition:all var(--dur-slow)}
+    .stab .tl{font-size:13px;font-weight:500;color:var(--color-muted);transition:all var(--dur-slow);letter-spacing:-.01em}
+    .stab:hover .tn{color:var(--color-lime);transform:translateX(3px)}
+    .stab:hover .tl{color:var(--color-navy)}
+    .stab.active .tn{color:var(--color-lime)}
+    .stab.active .tl{color:var(--color-navy);font-weight:600}
+    .mtabs{display:flex;overflow-x:auto;scrollbar-width:none}
+    .mtabs::-webkit-scrollbar{display:none}
+    .mtab{flex-shrink:0;padding:12px 18px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--color-muted);border:none;background:none;cursor:none;border-bottom:2px solid transparent;transition:all var(--dur-slow);white-space:nowrap}
+    .mtab.active{color:var(--color-navy);border-bottom-color:var(--color-lime)}
+    .mtab:hover{color:var(--color-navy)}
+
+    /* -------- 10. REVEAL ANIMATIONS --------------------------- */
+    .hw{display:block;overflow:hidden}
+    .hw-i{transform:translateY(115%);animation:hwI 1.1s var(--ease-out) forwards}
+    @keyframes hwI{to{transform:translateY(0)}}
+    @keyframes jit{0%,91%,100%{transform:translate(0)}92%{transform:translate(-4px,2px)}94%{transform:translate(4px,-2px)}96%{transform:translate(-3px,1px)}98%{transform:translate(2px,-1px)}99%{transform:translate(-1px)}}
+    .glitch{animation:jit 5s ease-in-out infinite}
+    .rv{opacity:0;transform:translateY(36px);transition:opacity var(--dur-reveal) var(--ease-out),transform var(--dur-reveal) var(--ease-out)}
+    .rv.v{opacity:1;transform:translateY(0)}
+    .rb{opacity:0;filter:blur(14px);transform:scale(.96);transition:all 1.1s var(--ease-out)}
+    .rb.v{opacity:1;filter:blur(0);transform:scale(1)}
+    .d1{transition-delay:.05s}.d2{transition-delay:.1s}.d3{transition-delay:.15s}.d4{transition-delay:.2s}.d5{transition-delay:.25s}.d6{transition-delay:.3s}.d7{transition-delay:.35s}.d8{transition-delay:.4s}
+    .page.entering{animation:pgIn .55s var(--ease-out) forwards}
+    @keyframes pgIn{from{opacity:0;transform:translateY(14px);filter:blur(5px)}to{opacity:1;transform:translateY(0);filter:blur(0)}}
+
+    /* -------- 11. SCROLL-PINNED CARD SECTION ------------------ */
+    /* Wraps a sticky inner container so that scrolling the page
+       translates the card track vertically, one card at a time */
+    .pin-section{
+      position:relative;
+      height:calc(var(--pin-cards,6) * 100vh);
+      background:transparent;
+    }
+    .pin-sticky{
+      position:sticky;
+      top:0;
+      height:100vh;
+      overflow:hidden;
+      display:flex;
+      align-items:flex-start;
+      justify-content:center;
+    }
+    .pin-track{
+      display:flex;
+      flex-direction:column;
+      width:100%;
+      will-change:transform;
+    }
+    .pin-card{
+      height:100vh;
+      width:100%;
+      flex-shrink:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:0 var(--content-pad-x);
+      position:relative;
+    }
+    .pin-card-inner{
+      width:min(1080px,92vw);
+      max-height:84vh;
+      background:rgba(255,255,255,.96);
+      backdrop-filter:blur(20px);
+      -webkit-backdrop-filter:blur(20px);
+      border:1px solid var(--color-border);
+      border-radius:var(--radius-2xl);
+      padding:clamp(2rem,5vw,4rem);
+      display:grid;
+      grid-template-columns:auto 1fr auto;
+      align-items:center;
+      gap:clamp(1.5rem,4vw,3.5rem);
+      box-shadow:var(--shadow-lg);
+      position:relative;
+      overflow:hidden;
+      transform:scale(.88) translateY(40px);
+      opacity:0;
+      filter:blur(8px);
+      transition:transform .9s var(--ease-out),opacity .9s var(--ease-out),filter .9s var(--ease-out),box-shadow .6s var(--ease-out);
+    }
+    /* Light gradient inside card (top-left spotlight) */
+    .pin-card-inner::before{
+      content:'';
+      position:absolute;
+      top:-30%;left:-15%;
+      width:60%;height:90%;
+      background:radial-gradient(ellipse,rgba(200,255,0,.10),transparent 60%);
+      pointer-events:none;
+      opacity:0;
+      transition:opacity .9s var(--ease-out);
+    }
+    .pin-card-inner::after{
+      content:'';
+      position:absolute;
+      bottom:-40%;right:-20%;
+      width:70%;height:90%;
+      background:radial-gradient(ellipse,rgba(11,20,38,.06),transparent 60%);
+      pointer-events:none;
+      opacity:0;
+      transition:opacity .9s var(--ease-out);
+    }
+    .pin-card.active .pin-card-inner{
+      transform:scale(1) translateY(0);
+      opacity:1;
+      filter:blur(0);
+      box-shadow:var(--shadow-lg),0 0 0 1px rgba(200,255,0,.10);
+    }
+    .pin-card.active .pin-card-inner::before,
+    .pin-card.active .pin-card-inner::after{opacity:1}
+    .pin-card.past .pin-card-inner{transform:scale(.85) translateY(-60px);opacity:0;filter:blur(12px)}
+    .pin-card.upcoming .pin-card-inner{transform:scale(.88) translateY(40px);opacity:0;filter:blur(8px)}
+
+    .pin-visual{
+      position:relative;
+      width:120px;height:120px;
+      display:flex;align-items:center;justify-content:center;
+      flex-shrink:0;
+    }
+    .pin-x{
+      font-family:var(--font-serif);
+      font-size:8rem;
+      font-weight:800;
+      color:var(--color-navy);
+      opacity:.06;
+      line-height:1;
+      transition:all var(--dur-slow) var(--ease-spring);
+    }
+    .pin-card.active .pin-x{color:var(--color-lime);opacity:.6;transform:rotate(-10deg) scale(1.1);text-shadow:0 0 40px rgba(200,255,0,.5)}
+    .pin-num{
+      position:absolute;
+      top:-8px;right:-12px;
+      font-family:var(--font-mono);
+      font-size:var(--text-xs);
+      font-weight:600;
+      color:var(--color-muted);
+      letter-spacing:.12em;
+      background:var(--color-surface);
+      padding:4px 8px;
+      border-radius:6px;
+      border:1px solid var(--color-border);
+    }
+    .pin-body{min-width:0;position:relative;z-index:1}
+    .pin-title{
+      font-family:var(--font-serif);
+      font-size:clamp(2rem,4vw,3.5rem);
+      font-weight:700;
+      color:var(--color-text);
+      letter-spacing:-.025em;
+      margin-bottom:1rem;
+      line-height:1.05;
+    }
+    .pin-desc{
+      color:var(--color-text-muted);
+      font-size:clamp(1rem,1.4vw,1.15rem);
+      line-height:1.65;
+      max-width:40rem;
+    }
+    .pin-arrow{
+      width:56px;height:56px;
+      border-radius:50%;
+      background:var(--color-cream);
+      display:flex;align-items:center;justify-content:center;
+      color:var(--color-muted);
+      font-size:1.4rem;
+      flex-shrink:0;
+      transition:all var(--dur-slow) var(--ease-spring);
+      border:1px solid var(--color-border);
+    }
+    .pin-card.active .pin-arrow{
+      background:var(--color-lime);
+      color:var(--color-navy);
+      transform:translateX(4px);
+      box-shadow:var(--shadow-glow-lime);
+    }
+    @media(max-width:640px){
+      .pin-card-inner{
+        grid-template-columns:auto 1fr;
+        grid-template-areas:"visual body";
+        gap:var(--space-md);
+        padding:var(--space-xl) var(--space-lg);
+      }
+      .pin-visual{width:70px;height:70px}
+      .pin-x{font-size:4.5rem}
+      .pin-arrow{display:none}
+      .pin-body{grid-area:body}
+      .pin-title{font-size:1.6rem}
+      .pin-desc{font-size:.95rem}
+    }
+
+    /* Pin navigation dots (bottom of viewport) */
+    .pin-dots{
+      position:absolute;
+      bottom:32px;left:50%;
+      transform:translateX(-50%);
+      display:flex;gap:14px;
+      z-index:5;
+      pointer-events:auto;
+    }
+    .pin-dot{
+      width:8px;height:8px;
+      border-radius:50%;
+      background:rgba(11,20,38,.15);
+      border:none;
+      cursor:none;
+      padding:0;
+      transition:all var(--dur-base) var(--ease-spring);
+      position:relative;
+    }
+    .pin-dot.active{
+      background:var(--color-lime);
+      width:32px;
+      border-radius:4px;
+      box-shadow:0 0 12px rgba(200,255,0,.7),0 0 28px rgba(200,255,0,.3);
+    }
+    .pin-scroll-hint{
+      position:absolute;
+      bottom:74px;left:50%;
+      transform:translateX(-50%);
+      font-family:var(--font-mono);
+      font-size:var(--text-xs);
+      letter-spacing:.2em;
+      text-transform:uppercase;
+      color:var(--color-muted);
+      opacity:.6;
+      pointer-events:none;
+      animation:hintPulse 2.4s ease-in-out infinite;
+    }
+    @keyframes hintPulse{0%,100%{opacity:.4;transform:translateX(-50%) translateY(0)}50%{opacity:.85;transform:translateX(-50%) translateY(4px)}}
+
+    /* -------- 12. CURLING SCROLL LINE (CSS scroll-driven, zero JS) ----- */
+    /* Uses native CSS scroll-driven animations (animation-timeline: scroll()).
+       This is GPU-composited and costs ZERO JS per frame — the browser
+       handles it natively. Fallback: line is fully visible (no animation). */
+    .curl-svg{
+      position:absolute;
+      top:0;left:0;
+      width:100%;height:100%;
+      pointer-events:none;
+      z-index:0;
+      overflow:visible;
+    }
+    .curl-path{
+      fill:none;
+      stroke:var(--color-lime);
+      stroke-width:2.5;
+      stroke-linecap:round;
+      stroke-linejoin:round;
+      vector-effect:non-scaling-stroke;
+      filter:drop-shadow(0 0 6px rgba(200,255,0,.6)) drop-shadow(0 0 14px rgba(200,255,0,.25));
+      opacity:.9;
+      stroke-dasharray:1;
+      stroke-dashoffset:0; /* fallback: fully visible */
+    }
+    .curl-end{
+      fill:var(--color-lime);
+      filter:drop-shadow(0 0 8px rgba(200,255,0,.7));
+      vector-effect:non-scaling-stroke;
+      transform-origin:center;
+    }
+    .curl-flash-ring{
+      fill:none;
+      stroke:var(--color-lime);
+      stroke-width:2;
+      vector-effect:non-scaling-stroke;
+      opacity:0;
+      transform-origin:center;
+    }
+
+    /* Only enable scroll-driven animation in supporting browsers */
+    @supports (animation-timeline: scroll()){
+      .curl-path{
+        animation:curlDraw linear both;
+        animation-timeline:scroll();
+      }
+      @keyframes curlDraw{
+        from{stroke-dashoffset:1}
+        to{stroke-dashoffset:0}
+      }
+      /* Endpoint warms up in the last 15% of scroll */
+      .curl-end{
+        animation:curlWarm linear both;
+        animation-timeline:scroll();
+        animation-range:85% 100%;
+      }
+      @keyframes curlWarm{
+        from{fill:var(--color-lime);filter:drop-shadow(0 0 8px rgba(200,255,0,.7))}
+        to{fill:var(--color-lime-soft);filter:drop-shadow(0 0 16px rgba(200,255,0,.9)) drop-shadow(0 0 32px rgba(200,255,0,.5))}
+      }
+      /* Light burst fires in the last 3% of scroll */
+      .curl-end.flash-on-scroll{
+        animation:curlBurst linear both;
+        animation-timeline:scroll();
+        animation-range:97% 100%;
+      }
+      @keyframes curlBurst{
+        0%{fill:var(--color-lime);filter:drop-shadow(0 0 8px rgba(200,255,0,.7));transform:scale(1)}
+        40%{fill:#fff;filter:drop-shadow(0 0 30px rgba(255,255,255,1)) drop-shadow(0 0 60px rgba(200,255,0,.8));transform:scale(2.5)}
+        70%{fill:var(--color-lime-soft);filter:drop-shadow(0 0 20px rgba(200,255,0,.8));transform:scale(1.5)}
+        100%{fill:var(--color-lime);filter:drop-shadow(0 0 12px rgba(200,255,0,.6));transform:scale(1.2)}
+      }
+      /* Expanding flash ring */
+      .curl-flash-ring.flash-on-scroll{
+        animation:curlRing linear both;
+        animation-timeline:scroll();
+        animation-range:97% 100%;
+      }
+      @keyframes curlRing{
+        0%{opacity:0;transform:scale(.5);stroke-width:3}
+        20%{opacity:.8;transform:scale(1.5)}
+        100%{opacity:0;transform:scale(8);stroke-width:.5}
+      }
+    }
+
+    /* -------- 13. EXISTING COMPONENTS (refined) --------------- */
+    .si{transition:all var(--dur-slow) var(--ease-out)}
+    .si:hover .snum{color:var(--color-lime);transform:translateX(4px)}
+    .si:hover .sline{background:var(--color-lime);width:40px}
+    .snum{font-family:var(--font-mono);font-variant-numeric:tabular-nums;transition:all var(--dur-slow) var(--ease-out)}
+    .sline{width:20px;height:1px;background:rgba(11,20,38,.08);transition:all var(--dur-slow) var(--ease-out)}
+    .ft{transition:all var(--dur-base) var(--ease-out)}
+    .ft:hover{background:rgba(200,255,0,.08);border-color:var(--color-border-lime);transform:translateY(-2px);box-shadow:0 0 24px rgba(200,255,0,.15)}
+    .ft:hover .fic{color:var(--color-lime);transform:translateY(-2px)}
+    .qc{transition:transform var(--dur-slow) var(--ease-out),box-shadow var(--dur-slow) var(--ease-out),border-color var(--dur-slow) var(--ease-out)}
+    .qc:hover{transform:translateY(-6px);box-shadow:var(--shadow-md);border-color:rgba(200,255,0,.22)}
+    .ctr{font-variant-numeric:tabular-nums}
+    @keyframes pd{0%,100%{transform:scale(1);opacity:0}50%{transform:scale(2.5);opacity:.12}}
+    .pdot{position:relative}
+    .pdot::after{content:'';position:absolute;inset:-3px;border-radius:50%;background:var(--color-lime);opacity:0;animation:pd 2s ease-in-out infinite}
+    @keyframes fl{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+    .fl{animation:fl 6s ease-in-out infinite}
+    .fi{transition:border-color var(--dur-base),box-shadow var(--dur-base)}
+    .fi:focus{border-color:var(--color-lime)!important;box-shadow:0 0 0 3px rgba(200,255,0,.15),0 0 20px rgba(200,255,0,.2);outline:none}
+    .sel-arrow{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='%23666'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
+    .lh{position:relative;display:inline}
+    .lh::after{content:'';position:absolute;bottom:-1px;left:0;width:0;height:1px;background:var(--color-lime);box-shadow:0 0 6px rgba(200,255,0,.5);transition:width var(--dur-slow)}
+    .lh:hover::after{width:100%}
+    .btn-m{transition:transform var(--dur-fast) var(--ease-out),box-shadow var(--dur-base)}
+    .btn-m:hover{box-shadow:0 14px 40px rgba(0,0,0,.16),0 0 30px rgba(200,255,0,.25)}
+    .btn-m:active{transform:scale(.97)!important}
+    .btn-inner{transition:transform .12s ease-out;display:inline-flex;align-items:center}
+    .ih{transition:transform var(--dur-slow) var(--ease-out),color var(--dur-slow),filter var(--dur-slow)}
+    .ih:hover{transform:translateY(-3px);filter:drop-shadow(0 0 10px rgba(200,255,0,.4))}
+    .net-canvas{position:absolute;right:-5%;top:50%;transform:translateY(-50%);width:60%;height:85%;opacity:.55;pointer-events:none}
+    .toast{transform:translateY(20px) scale(.95);opacity:0;transition:all var(--dur-slow) var(--ease-out)}
+    .toast.show{transform:translateY(0) scale(1);opacity:1}
+    .scramble{font-family:var(--font-mono)}
+    .sn{font-family:var(--font-mono)}
+    @keyframes glowPulse{0%,100%{box-shadow:0 0 0 0 rgba(200,255,0,0)}50%{box-shadow:0 0 0 14px rgba(200,255,0,.10),0 0 30px rgba(200,255,0,.3)}}
+    .glow-pulse{animation:glowPulse 3s ease-in-out infinite}
+    .eyebrow{font-family:var(--font-mono);font-size:var(--text-xs);font-weight:500;letter-spacing:.2em;text-transform:uppercase;color:var(--color-muted)}
+    .display-h{font-family:var(--font-serif);font-weight:800;letter-spacing:-.03em;line-height:.9}
+
+    /* Dark section light accents */
+    .dark-section{position:relative;overflow:hidden}
+    .dark-section::before{
+      content:'';
+      position:absolute;
+      top:-30%;left:50%;
+      transform:translateX(-50%);
+      width:80%;height:60%;
+      background:radial-gradient(ellipse,rgba(200,255,0,.08),transparent 60%);
+      pointer-events:none;
+    }
+    .dark-section::after{
+      content:'';
+      position:absolute;
+      bottom:-40%;right:-10%;
+      width:50%;height:80%;
+      background:radial-gradient(ellipse,rgba(150,200,255,.06),transparent 60%);
+      pointer-events:none;
+    }
+
+    /* Light bloom animation */
+    @keyframes bloomFloat{
+      0%,100%{transform:translate(0,0) scale(1)}
+      33%{transform:translate(30px,-20px) scale(1.1)}
+      66%{transform:translate(-20px,30px) scale(.95)}
+    }
+    .bloom-float{animation:bloomFloat 14s ease-in-out infinite}
+    .bloom-float-2{animation:bloomFloat 18s ease-in-out infinite reverse}
+
+    /* -------- 14. LOADING SCREEN ------------------------------ */
+    .loader{
+      position:fixed;
+      inset:0;
+      z-index:10000;
+      background:var(--color-cream);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:2.5rem;
+      transition:opacity .8s var(--ease-out),visibility .8s var(--ease-out);
+    }
+    .loader.done{opacity:0;visibility:hidden;pointer-events:none}
+    .loader-stage{
+      position:relative;
+      width:180px;height:180px;
+      display:flex;align-items:center;justify-content:center;
+    }
+    .loader-svg{
+      position:absolute;inset:0;
+      width:100%;height:100%;
+    }
+    .loader-ring{
+      fill:none;
+      stroke:rgba(11,20,38,.08);
+      stroke-width:1.5;
+    }
+    .loader-progress{
+      fill:none;
+      stroke:var(--color-lime);
+      stroke-width:2.5;
+      stroke-linecap:round;
+      filter:drop-shadow(0 0 8px rgba(200,255,0,.6)) drop-shadow(0 0 18px rgba(200,255,0,.3));
+      transform:rotate(-90deg);
+      transform-origin:center;
+      transition:stroke-dashoffset .3s var(--ease-out);
+    }
+    .loader-logo{
+      font-family:var(--font-serif);
+      font-weight:800;
+      font-size:1.5rem;
+      letter-spacing:-.02em;
+      color:var(--color-navy);
+      animation:loaderPulse 2s ease-in-out infinite;
+    }
+    @keyframes loaderPulse{0%,100%{opacity:1}50%{opacity:.6}}
+    .loader-text{
+      font-family:var(--font-mono);
+      font-size:var(--text-xs);
+      letter-spacing:.25em;
+      text-transform:uppercase;
+      color:var(--color-muted);
+    }
+    .loader-pct{
+      font-family:var(--font-mono);
+      font-size:.75rem;
+      color:var(--color-navy);
+      font-weight:600;
+      letter-spacing:.1em;
+    }
+    /* Floating dots around loader */
+    .loader-dot{
+      position:absolute;
+      width:6px;height:6px;
+      border-radius:50%;
+      background:var(--color-lime);
+      box-shadow:0 0 8px rgba(200,255,0,.6);
+      animation:loaderDot 3s ease-in-out infinite;
+    }
+    @keyframes loaderDot{
+      0%,100%{transform:translate(0,0) scale(1);opacity:.8}
+      50%{transform:translate(var(--dx,20px),var(--dy,-20px)) scale(1.3);opacity:1}
+    }
+  </style>
+</head>
+<body class="antialiased">
+
+<!-- ============== LOADING SCREEN ============== -->
+<div class="loader" id="loader">
+  <div class="loader-stage">
+    <svg class="loader-svg" viewBox="0 0 100 100">
+      <circle class="loader-ring" cx="50" cy="50" r="44"/>
+      <circle class="loader-progress" id="loaderProgress" cx="50" cy="50" r="44" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/>
+    </svg>
+    <span class="loader-logo">Urbancoms</span>
+    <span class="loader-dot" style="top:10%;left:20%;--dx:15px;--dy:-10px;animation-delay:0s"></span>
+    <span class="loader-dot" style="top:20%;right:15%;--dx:-12px;--dy:18px;animation-delay:.4s"></span>
+    <span class="loader-dot" style="bottom:15%;left:18%;--dx:18px;--dy:-15px;animation-delay:.8s"></span>
+    <span class="loader-dot" style="bottom:22%;right:20%;--dx:-14px;--dy:-12px;animation-delay:1.2s"></span>
+  </div>
+  <div class="text-center">
+    <div class="loader-text mb-2">Connecting</div>
+    <div class="loader-pct" id="loaderPct">0%</div>
+  </div>
+</div>
+
+<!-- ============== CUSTOM CURSOR (light system) ============== -->
+<div class="cur-glow" id="cGlow"></div>
+<div class="cur-ring" id="cRing"></div>
+<div class="cur-dot" id="cDot"></div>
+
+<!-- ============== GLOBAL BACKGROUND CANVAS ============== -->
+<canvas class="bg-canvas" id="bgCanvas"></canvas>
+
+<!-- ============== SCROLL PROGRESS RAIL ============== -->
+<div class="scroll-rail" id="scrollRail">
+  <div class="sr-track">
+    <div class="sr-tick" data-pos="0" style="top:0"></div>
+    <div class="sr-tick" data-pos="25" style="top:25%"></div>
+    <div class="sr-tick" data-pos="50" style="top:50%"></div>
+    <div class="sr-tick" data-pos="75" style="top:75%"></div>
+    <div class="sr-tick" data-pos="100" style="top:100%"></div>
+  </div>
+  <div class="sr-fill" id="srFill" style="height:0%"></div>
+  <div class="sr-dot" id="srDot" style="top:0%"></div>
+</div>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="px-5 py-6 border-b border-navy/[.04]">
+      <a href="#" onclick="switchTab('home');return false" class="logo-link inline-flex items-center gap-3">
+        <div class="logo-mark"><div class="logo-u"></div></div>
+        <span class="font-serif font-bold text-[17px] tracking-tight text-navy">Urbancoms</span>
+      </a>
+    </div>
+    <nav class="flex-1 py-4 px-3 relative" id="sideNav">
+      <button class="stab active" data-tab="home"><span class="tn">01</span><span class="tl">Home</span></button>
+      <button class="stab" data-tab="services"><span class="tn">02</span><span class="tl">Services</span></button>
+      <button class="stab" data-tab="blocks"><span class="tn">03</span><span class="tl">Blocks</span></button>
+      <button class="stab" data-tab="clients"><span class="tn">04</span><span class="tl">Clients</span></button>
+      <button class="stab" data-tab="about"><span class="tn">05</span><span class="tl">About</span></button>
+      <button class="stab" data-tab="contact"><span class="tn">06</span><span class="tl">Contact</span></button>
+      <div class="tab-ind" id="tabInd"></div>
+    </nav>
+    <div class="px-5 py-5 border-t border-navy/[.04] space-y-2.5">
+      <a href="tel:02084451599" class="lh text-[11px] text-muted hover:text-navy transition-colors block sn">020 8445 1599</a>
+      <a href="mailto:support@urbancoms.co.uk" class="lh text-[11px] text-muted hover:text-navy transition-colors block">support@urbancoms.co.uk</a>
+      <div class="pt-2 flex items-center gap-3">
+        <a href="#" class="text-muted/30 hover:text-lime transition-colors"><span class="iconify text-base" data-icon="mdi:linkedin"></span></a>
+        <a href="#" class="text-muted/30 hover:text-lime transition-colors"><span class="iconify text-base" data-icon="mdi:twitter"></span></a>
+      </div>
+    </div>
+  </aside>
+
+  <div class="cw">
+    <header class="mhead">
+      <div class="flex items-center justify-between px-4 py-3 border-b border-navy/[.04]">
+        <a href="#" onclick="switchTab('home');return false" class="logo-link inline-flex items-center gap-2">
+          <div class="logo-mark" style="width:26px;height:26px"><div class="logo-u" style="width:14px;height:14px;border-width:2px;border-radius:0 0 8px 8px"></div></div>
+          <span class="font-serif font-bold text-sm tracking-tight text-navy">Urbancoms</span>
+        </a>
+        <a href="tel:02084451599" class="text-[10px] text-muted font-medium sn">020 8445 1599</a>
+      </div>
+      <div class="mtabs px-2" id="mtabs">
+        <button class="mtab active" data-tab="home">Home</button>
+        <button class="mtab" data-tab="services">Services</button>
+        <button class="mtab" data-tab="blocks">Blocks</button>
+        <button class="mtab" data-tab="clients">Clients</button>
+        <button class="mtab" data-tab="about">About</button>
+        <button class="mtab" data-tab="contact">Contact</button>
+      </div>
+    </header>
+
+    <main class="main" id="mainEl">
+
+      <!-- ============== HOME ============== -->
+      <div class="page active" data-page="home" id="page-home">
+        <svg class="curl-svg" viewBox="0 0 100 1000" preserveAspectRatio="none">
+          <path class="curl-path" pathLength="1" d="M 25,0 C 80,60 -30,120 25,180 C 80,240 -30,300 25,360 C 80,420 -30,480 25,540 C 80,600 -30,660 25,720 C 80,780 -30,840 25,900 C 60,940 60,980 50,1000"/>
+          <circle class="curl-flash-ring flash-on-scroll" cx="50" cy="1000" r="3"/>
+          <circle class="curl-end flash-on-scroll" cx="50" cy="1000" r="2.5"/>
+        </svg>
+
+        <!-- Curling scroll line (part of content, not fixed) -->
+<!-- HERO -->
+        <div class="relative min-h-screen flex flex-col justify-center px-6 md:px-12 lg:px-16 pt-20 pb-16 overflow-hidden dot-bg" style="z-index:1">
+          <canvas class="net-canvas" id="netCanvas"></canvas>
+          <div class="light-bloom lime bloom-float" style="top:25%;left:20%;width:480px;height:480px"></div>
+          <div class="light-bloom warm bloom-float-2" style="top:60%;right:15%;width:380px;height:380px;opacity:.4"></div>
+          <div class="max-w-4xl relative z-10" id="heroText">
+            <div class="mb-6" style="animation:pgIn .8s .1s both">
+              <span class="sn text-[10px] font-medium uppercase tracking-[.2em] text-muted">Bespoke Telecoms — United Kingdom</span>
+            </div>
+            <h1 class="display-h mb-10" style="font-size:var(--text-display)">
+              <span class="hw"><span class="hw-i" style="animation-delay:.2s">Your</span></span>
+              <span class="hw"><span class="hw-i" style="animation-delay:.32s">telecoms</span></span>
+              <span class="hw"><span class="hw-i" style="animation-delay:.44s">are</span></span>
+              <span class="hw"><span class="hw-i glitch text-lime" style="animation-delay:.56s">broken.</span></span>
+            </h1>
+            <div style="animation:pgIn 1s .78s both" class="flex flex-col sm:flex-row items-start gap-4 mb-20">
+              <button onclick="switchTab('contact')" class="btn-m glow-pulse bg-navy text-cream font-semibold text-sm px-8 py-4 rounded-full relative overflow-hidden" data-magnetic>
+                <span class="btn-inner relative z-10 gap-2">Free analysis <span class="iconify" data-icon="mdi:arrow-right"></span></span>
+              </button>
+              <a href="#problems" class="btn-m text-muted font-medium text-sm px-8 py-4 rounded-full border border-navy/10 hover:border-navy/20 hover:text-navy transition-colors">See why ↓</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- SCROLL-PINNED CARD SECTION (replaces horizontal carousel) -->
+        <section id="problems" class="pin-section" style="--pin-cards:6;z-index:1">
+          <div class="pin-sticky">
+            <div class="pin-track" id="pinTrack">
+              <article class="pin-card">
+                <div class="pin-card-inner">
+                  <div class="pin-visual"><span class="pin-x">✕</span><span class="pin-num">01</span></div>
+                  <div class="pin-body">
+                    <h3 class="pin-title">40 min on hold</h3>
+                    <p class="pin-desc">Automated menus instead of real people. Every support call turns into a waiting game with no end in sight — your time treated as freely disposable.</p>
+                  </div>
+                  <div class="pin-arrow"><span class="iconify" data-icon="mdi:arrow-right"></span></div>
+                </div>
+              </article>
+              <article class="pin-card">
+                <div class="pin-card-inner">
+                  <div class="pin-visual"><span class="pin-x">✕</span><span class="pin-num">02</span></div>
+                  <div class="pin-body">
+                    <h3 class="pin-title">5 different bills</h3>
+                    <p class="pin-desc">Multiple providers, multiple headaches. Each invoice arrives in a different format, on a different date, with different terms you have to decode.</p>
+                  </div>
+                  <div class="pin-arrow"><span class="iconify" data-icon="mdi:arrow-right"></span></div>
+                </div>
+              </article>
+              <article class="pin-card">
+                <div class="pin-card-inner">
+                  <div class="pin-visual"><span class="pin-x">✕</span><span class="pin-num">03</span></div>
+                  <div class="pin-body">
+                    <h3 class="pin-title">Mystery charges</h3>
+                    <p class="pin-desc">No idea what half your lines do. Line rental, call packages, hardware lease — buried in jargon you don't have time to unpick every month.</p>
+                  </div>
+                  <div class="pin-arrow"><span class="iconify" data-icon="mdi:arrow-right"></span></div>
+                </div>
+              </article>
+              <article class="pin-card">
+                <div class="pin-card-inner">
+                  <div class="pin-visual"><span class="pin-x">✕</span><span class="pin-num">04</span></div>
+                  <div class="pin-body">
+                    <h3 class="pin-title">3-day fault fixes</h3>
+                    <p class="pin-desc">Residents or staff stuck with no urgency. SLAs that suit the supplier, never the people actually affected — a lift line down for days, not hours.</p>
+                  </div>
+                  <div class="pin-arrow"><span class="iconify" data-icon="mdi:arrow-right"></span></div>
+                </div>
+              </article>
+              <article class="pin-card">
+                <div class="pin-card-inner">
+                  <div class="pin-visual"><span class="pin-x">✕</span><span class="pin-num">05</span></div>
+                  <div class="pin-body">
+                    <h3 class="pin-title">Locked-in contracts</h3>
+                    <p class="pin-desc">No flexibility as you grow. Two- or three-year tie-ins that punish you for adapting your business to a changing market or new sites.</p>
+                  </div>
+                  <div class="pin-arrow"><span class="iconify" data-icon="mdi:arrow-right"></span></div>
+                </div>
+              </article>
+              <article class="pin-card">
+                <div class="pin-card-inner">
+                  <div class="pin-visual"><span class="pin-x">✕</span><span class="pin-num">06</span></div>
+                  <div class="pin-body">
+                    <h3 class="pin-title">No single contact</h3>
+                    <p class="pin-desc">Passed between departments endlessly. A new person each time, no ownership of your issue, no memory of what came before — start from scratch, every time.</p>
+                  </div>
+                  <div class="pin-arrow"><span class="iconify" data-icon="mdi:arrow-right"></span></div>
+                </div>
+              </article>
+            </div>
+            <div class="pin-scroll-hint" id="pinHint">Scroll to explore</div>
+            <div class="pin-dots" id="pinDots">
+              <button class="pin-dot active" data-index="0"></button>
+              <button class="pin-dot" data-index="1"></button>
+              <button class="pin-dot" data-index="2"></button>
+              <button class="pin-dot" data-index="3"></button>
+              <button class="pin-dot" data-index="4"></button>
+              <button class="pin-dot" data-index="5"></button>
+            </div>
+          </div>
+        </section>
+
+        <!-- DARK ANSWER SECTION -->
+        <section class="dark-section relative py-28 md:py-40 px-6 md:px-12 lg:px-16 bg-navy text-white overflow-hidden" style="z-index:1">
+          <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 font-serif text-[26rem] font-black text-white/[.01] select-none pointer-events-none hidden lg:block leading-none">U</div>
+          <div class="light-bloom lime bloom-float" style="top:10%;left:10%;width:400px;height:400px;opacity:.3"></div>
+          <div class="max-w-3xl mx-auto text-center relative rv z-10">
+            <span class="sn text-[10px] font-medium uppercase tracking-[.2em] text-white/20 block mb-6">The answer</span>
+            <h2 class="font-serif font-black text-3xl md:text-6xl tracking-[-.02em] leading-tight mb-8">This is<br><span class="text-lime">Urbancoms.</span></h2>
+            <p class="text-white/40 text-lg leading-relaxed max-w-xl mx-auto mb-12">Bespoke telecoms for single and multi-site businesses. One bill, one contact, full UK support. No call centres.</p>
+            <button onclick="switchTab('services')" class="btn-m inline-flex items-center gap-2 bg-lime text-navy font-bold text-sm px-8 py-4 rounded-full relative overflow-hidden" data-magnetic>
+              <span class="btn-inner relative z-10 gap-2">See our services <span class="iconify" data-icon="mdi:arrow-right"></span></span>
+            </button>
+          </div>
+        </section>
+
+        <!-- STATS -->
+        <section class="py-24 md:py-36 px-6 md:px-12 lg:px-16 dot-bg relative" style="z-index:1">
+          <div class="light-bloom lime bloom-float-2" style="bottom:10%;right:10%;width:340px;height:340px;opacity:.35"></div>
+          <div class="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-10 md:gap-6 relative z-10">
+            <div class="rb d1"><div class="font-serif text-5xl md:text-7xl font-black text-navy ctr" data-target="500">0</div><div class="sn text-[10px] uppercase tracking-[.16em] text-muted mt-2 font-medium">Lines managed</div></div>
+            <div class="rb d2"><div class="font-serif text-5xl md:text-7xl font-black text-navy ctr" data-target="50">0</div><div class="sn text-[10px] uppercase tracking-[.16em] text-muted mt-2 font-medium">Blocks served</div></div>
+            <div class="rb d3"><div class="font-serif text-5xl md:text-7xl font-black text-lime">~30%</div><div class="sn text-[10px] uppercase tracking-[.16em] text-muted mt-2 font-medium">Avg. savings</div></div>
+            <div class="rb d4"><div class="font-serif text-5xl md:text-7xl font-black text-navy">3mo</div><div class="sn text-[10px] uppercase tracking-[.16em] text-muted mt-2 font-medium">Rolling contracts</div></div>
+          </div>
+        </section>
+      </div>
+
+      <!-- ============== SERVICES ============== -->
+      <div class="page" data-page="services" id="page-services">
+        <svg class="curl-svg" viewBox="0 0 100 1000" preserveAspectRatio="none">
+          <path class="curl-path" pathLength="1" d="M 75,0 C 20,80 80,160 25,240 C -30,320 80,400 25,480 C 80,560 20,640 75,720 C 20,800 80,880 50,1000"/>
+          <circle class="curl-flash-ring flash-on-scroll" cx="50" cy="1000" r="3"/>
+          <circle class="curl-end flash-on-scroll" cx="50" cy="1000" r="2.5"/>
+        </svg>
+
+<div class="py-20 md:py-28 px-6 md:px-12 lg:px-16 dot-bg relative" style="z-index:1">
+          <div class="light-bloom lime bloom-float" style="top:5%;right:5%;width:380px;height:380px;opacity:.4"></div>
+          <div class="max-w-4xl mx-auto mb-16 rv relative z-10"><span class="eyebrow block mb-3">02 — Services</span><h2 class="font-serif font-black text-3xl md:text-5xl tracking-[-.02em] leading-tight">Everything you need.</h2></div>
+          <div class="max-w-4xl mx-auto relative z-10">
+            <div class="si flex items-start gap-4 md:gap-8 py-8 border-b border-navy/[.06] rv d1"><div class="flex items-center gap-4 md:gap-6 shrink-0"><span class="snum text-3xl md:text-5xl font-bold text-navy/[.06] w-14 md:w-16 text-right scramble" data-text="01">01</span><div class="sline mt-3 hidden md:block"></div></div><div><h3 class="font-serif text-lg md:text-xl font-bold mb-1">Business Telephone Systems</h3><p class="text-muted text-sm leading-relaxed max-w-lg">World-leading manufacturer systems. Low-cost calls over the UK's most connected Next Generation Network.</p></div></div>
+            <div class="si flex items-start gap-4 md:gap-8 py-8 border-b border-navy/[.06] rv d2"><div class="flex items-center gap-4 md:gap-6 shrink-0"><span class="snum text-3xl md:text-5xl font-bold text-navy/[.06] w-14 md:w-16 text-right scramble" data-text="02">02</span><div class="sline mt-3 hidden md:block"></div></div><div><h3 class="font-serif text-lg md:text-xl font-bold mb-1">Cloud & Hosted Telephony</h3><p class="text-muted text-sm leading-relaxed max-w-lg">Cloud-based VoIP with non-geographic or intelligent routing inbound numbers.</p></div></div>
+            <div class="si flex items-start gap-4 md:gap-8 py-8 border-b border-navy/[.06] rv d3"><div class="flex items-center gap-4 md:gap-6 shrink-0"><span class="snum text-3xl md:text-5xl font-bold text-navy/[.06] w-14 md:w-16 text-right scramble" data-text="03">03</span><div class="sline mt-3 hidden md:block"></div></div><div><h3 class="font-serif text-lg md:text-xl font-bold mb-1">Full Fibre Connectivity</h3><p class="text-muted text-sm leading-relaxed max-w-lg">SOGEA, FTTP and fibre Ethernet for ultra-fast, reliable internet.</p></div></div>
+            <div class="si flex items-start gap-4 md:gap-8 py-8 border-b border-navy/[.06] rv d4"><div class="flex items-center gap-4 md:gap-6 shrink-0"><span class="snum text-3xl md:text-5xl font-bold text-navy/[.06] w-14 md:w-16 text-right scramble" data-text="04">04</span><div class="sline mt-3 hidden md:block"></div></div><div><h3 class="font-serif text-lg md:text-xl font-bold mb-1">Business Mobiles & SIMs</h3><p class="text-muted text-sm leading-relaxed max-w-lg">Mobile services and hardware consolidated onto your single bill.</p></div></div>
+            <div class="si flex items-start gap-4 md:gap-8 py-8 border-b border-navy/[.06] rv d5"><div class="flex items-center gap-4 md:gap-6 shrink-0"><span class="snum text-3xl md:text-5xl font-bold text-navy/[.06] w-14 md:w-16 text-right scramble" data-text="05">05</span><div class="sline mt-3 hidden md:block"></div></div><div><h3 class="font-serif text-lg md:text-xl font-bold mb-1">Cabling & Infrastructure</h3><p class="text-muted text-sm leading-relaxed max-w-lg">CAT5/CAT6 cabling for offices, retail, blocks and construction.</p></div></div>
+            <div class="si flex items-start gap-4 md:gap-8 py-8 rv d6"><div class="flex items-center gap-4 md:gap-6 shrink-0"><span class="snum text-3xl md:text-5xl font-bold text-navy/[.06] w-14 md:w-16 text-right scramble" data-text="06">06</span><div class="sline mt-3 hidden md:block"></div></div><div><h3 class="font-serif text-lg md:text-xl font-bold mb-1">Energy Contracts</h3><p class="text-muted text-sm leading-relaxed max-w-lg">Electricity and gas alongside telecoms — another bill simplified.</p></div></div>
+          </div>
+        </div>
+        <section class="dark-section py-20 md:py-28 px-6 md:px-12 lg:px-16 bg-navy text-white relative" style="z-index:1">
+          <div class="max-w-4xl mx-auto relative z-10"><span class="sn text-[10px] font-medium uppercase tracking-[.2em] text-white/20 block mb-10 rv">How it works</span>
+            <div class="grid md:grid-cols-3 gap-8">
+              <div class="rv d1"><span class="font-serif text-6xl font-black text-lime/15 block mb-4">1</span><h3 class="font-serif font-bold text-lg mb-2">Free analysis</h3><p class="text-white/40 text-sm leading-relaxed">Send us your bills. We identify savings, dates and waste.</p></div>
+              <div class="rv d2"><span class="font-serif text-6xl font-black text-lime/15 block mb-4">2</span><h3 class="font-serif font-bold text-lg mb-2">Tailored proposal</h3><p class="text-white/40 text-sm leading-relaxed">We recommend the right mix for your specific setup.</p></div>
+              <div class="rv d3"><span class="font-serif text-6xl font-black text-lime/15 block mb-4">3</span><h3 class="font-serif font-bold text-lg mb-2">Seamless switch</h3><p class="text-white/40 text-sm leading-relaxed">We handle everything — ports, transfers, third-party liaison.</p></div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- ============== BLOCKS ============== -->
+      <div class="page" data-page="blocks" id="page-blocks">
+        <svg class="curl-svg" viewBox="0 0 100 1000" preserveAspectRatio="none">
+          <path class="curl-path" pathLength="1" d="M 25,0 C 80,80 -30,160 25,240 C 80,320 -30,400 25,480 C 80,560 -30,640 25,720 C 80,800 -30,880 50,1000"/>
+          <circle class="curl-flash-ring flash-on-scroll" cx="50" cy="1000" r="3"/>
+          <circle class="curl-end flash-on-scroll" cx="50" cy="1000" r="2.5"/>
+        </svg>
+
+<div class="py-20 md:py-28 px-6 md:px-12 lg:px-16 dot-bg relative" style="z-index:1">
+          <div class="light-bloom cool bloom-float" style="top:10%;left:5%;width:340px;height:340px;opacity:.4"></div>
+          <div class="max-w-5xl mx-auto relative z-10">
+            <div class="mb-14 rv"><span class="eyebrow block mb-3">03 — Specialist</span><h2 class="font-serif font-black text-3xl md:text-5xl tracking-[-.02em] leading-tight">Block management<br><span class="text-lime">telecoms, solved.</span></h2></div>
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mb-16">
+              <div class="ft flex items-center gap-2.5 rounded-xl px-4 py-3 border border-navy/[.06] bg-white rv d1"><span class="iconify fic text-muted text-lg ih" data-icon="mdi:elevator-passenger"></span><span class="text-[11px] font-medium text-navy/60">Lift lines</span></div>
+              <div class="ft flex items-center gap-2.5 rounded-xl px-4 py-3 border border-navy/[.06] bg-white rv d1"><span class="iconify fic text-muted text-lg ih" data-icon="mdi:gate"></span><span class="text-[11px] font-medium text-navy/60">Gate intercoms</span></div>
+              <div class="ft flex items-center gap-2.5 rounded-xl px-4 py-3 border border-navy/[.06] bg-white rv d2"><span class="iconify fic text-muted text-lg ih" data-icon="mdi:cctv"></span><span class="text-[11px] font-medium text-navy/60">CCTV</span></div>
+              <div class="ft flex items-center gap-2.5 rounded-xl px-4 py-3 border border-navy/[.06] bg-white rv d2"><span class="iconify fic text-muted text-lg ih" data-icon="mdi:sim"></span><span class="text-[11px] font-medium text-navy/60">Fixed IP SIMs</span></div>
+              <div class="ft flex items-center gap-2.5 rounded-xl px-4 py-3 border border-navy/[.06] bg-white rv d3"><span class="iconify fic text-muted text-lg ih" data-icon="mdi:desk-phone"></span><span class="text-[11px] font-medium text-navy/60">Concierge</span></div>
+              <div class="ft flex items-center gap-2.5 rounded-xl px-4 py-3 border border-navy/[.06] bg-white rv d3"><span class="iconify fic text-muted text-lg ih" data-icon="mdi:factory"></span><span class="text-[11px] font-medium text-navy/60">Plant rooms</span></div>
+              <div class="ft flex items-center gap-2.5 rounded-xl px-4 py-3 border border-navy/[.06] bg-white rv d4"><span class="iconify fic text-muted text-lg ih" data-icon="mdi:file-document-outline"></span><span class="text-[11px] font-medium text-navy/60">Bill analysis</span></div>
+              <div class="ft flex items-center gap-2.5 rounded-xl px-4 py-3 border border-navy/[.06] bg-white rv d4"><span class="iconify fic text-muted text-lg ih" data-icon="mdi:calendar-clock"></span><span class="text-[11px] font-medium text-navy/60">Contract diarising</span></div>
+              <div class="ft flex items-center gap-2.5 rounded-xl px-4 py-3 border border-navy/[.06] bg-white rv d5"><span class="iconify fic text-muted text-lg ih" data-icon="mdi:handshake-outline"></span><span class="text-[11px] font-medium text-navy/60">Third-party liaison</span></div>
+              <div class="ft flex items-center gap-2.5 rounded-xl px-4 py-3 border border-navy/[.06] bg-white rv d5"><span class="iconify fic text-muted text-lg ih" data-icon="mdi:flash"></span><span class="text-[11px] font-medium text-navy/60">Fast fault fix</span></div>
+              <div class="ft flex items-center gap-2.5 rounded-xl px-4 py-3 border border-navy/[.06] bg-white rv d6"><span class="iconify fic text-muted text-lg ih" data-icon="mdi:map-search-outline"></span><span class="text-[11px] font-medium text-navy/60">Site surveys</span></div>
+              <div class="ft flex items-center gap-2.5 rounded-xl px-4 py-3 border border-navy/[.06] bg-white rv d6"><span class="iconify fic text-muted text-lg ih" data-icon="mdi:swap-horizontal"></span><span class="text-[11px] font-medium text-navy/60">Supplier transfers</span></div>
+            </div>
+          </div>
+        </div>
+        <section class="px-6 md:px-12 lg:px-16 pb-20 md:pb-28 relative" style="z-index:1">
+          <div class="max-w-5xl mx-auto">
+            <div class="relative rounded-3xl overflow-hidden rv" style="box-shadow:var(--shadow-lg)"><img src="https://picsum.photos/seed/londonblk88/900/500.jpg" alt="Residential block" class="w-full h-[340px] md:h-[440px] object-cover"><div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div><div class="absolute bottom-0 left-0 right-0 p-6 md:p-8"><div class="grid grid-cols-3 gap-3"><div class="bg-white/10 backdrop-blur-lg rounded-2xl p-4 text-center border border-white/5"><div class="text-2xl font-serif font-black text-lime ctr" data-target="500">0</div><div class="sn text-[9px] uppercase tracking-[.12em] text-white/25 mt-1">Lines</div></div><div class="bg-white/10 backdrop-blur-lg rounded-2xl p-4 text-center border border-white/5"><div class="text-2xl font-serif font-black text-lime ctr" data-target="50">0</div><div class="sn text-[9px] uppercase tracking-[.12em] text-white/25 mt-1">Blocks</div></div><div class="bg-white/10 backdrop-blur-lg rounded-2xl p-4 text-center border border-white/5"><div class="text-2xl font-serif font-black text-lime">24/7</div><div class="sn text-[9px] uppercase tracking-[.12em] text-white/25 mt-1">Response</div></div></div></div></div>
+          </div>
+        </section>
+        <section class="dark-section py-20 md:py-28 px-6 md:px-12 lg:px-16 bg-navy text-white relative" style="z-index:1">
+          <div class="max-w-4xl mx-auto relative z-10"><span class="sn text-[10px] font-medium uppercase tracking-[.2em] text-white/20 block mb-8 rv">Why block managers choose us</span>
+            <div class="grid md:grid-cols-3 gap-5">
+              <div class="bg-white/[.04] rounded-2xl p-7 border border-white/[.05] rv d1"><div class="w-10 h-10 rounded-xl bg-lime/10 flex items-center justify-center mb-4"><span class="iconify text-lime text-lg" data-icon="mdi:receipt-text-outline"></span></div><h3 class="font-serif font-bold text-base mb-2">Itemised billing</h3><p class="text-white/40 text-sm leading-relaxed">Every block, every line, clearly separated.</p></div>
+              <div class="bg-white/[.04] rounded-2xl p-7 border border-white/[.05] rv d2"><div class="w-10 h-10 rounded-xl bg-lime/10 flex items-center justify-center mb-4"><span class="iconify text-lime text-lg" data-icon="mdi:wrench-outline"></span></div><h3 class="font-serif font-bold text-base mb-2">We talk to BT for you</h3><p class="text-white/40 text-sm leading-relaxed">Full liaison with lift, CCTV and legacy providers.</p></div>
+              <div class="bg-white/[.04] rounded-2xl p-7 border border-white/[.05] rv d3"><div class="w-10 h-10 rounded-xl bg-lime/10 flex items-center justify-center mb-4"><span class="iconify text-lime text-lg" data-icon="mdi:calendar-check-outline"></span></div><h3 class="font-serif font-bold text-base mb-2">We track deadlines</h3><p class="text-white/40 text-sm leading-relaxed">Contract dates diarised and managed.</p></div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- ============== CLIENTS ============== -->
+      <div class="page" data-page="clients" id="page-clients">
+        <svg class="curl-svg" viewBox="0 0 100 1000" preserveAspectRatio="none">
+          <path class="curl-path" pathLength="1" d="M 50,0 C 90,80 10,160 50,240 C 90,320 10,400 50,480 C 90,560 10,640 50,720 C 90,800 10,880 50,1000"/>
+          <circle class="curl-flash-ring flash-on-scroll" cx="50" cy="1000" r="3"/>
+          <circle class="curl-end flash-on-scroll" cx="50" cy="1000" r="2.5"/>
+        </svg>
+
+<div class="dark-section py-20 md:py-28 px-6 md:px-12 lg:px-16 bg-navy text-white relative" style="z-index:1">
+          <div class="light-bloom lime bloom-float" style="top:20%;left:15%;width:380px;height:380px;opacity:.25"></div>
+          <div class="max-w-3xl mx-auto text-center rv relative z-10"><span class="sn text-[10px] font-medium uppercase tracking-[.2em] text-lime/40 block mb-8">Featured client</span><p class="font-serif text-2xl md:text-4xl font-bold leading-snug tracking-tight text-white/80 mb-10">"Urbancoms consolidated multiple telephone lines from different providers into a single provider with competitive rates. They handled the entire switchover and identified what each line was used for."</p><div class="flex items-center justify-center gap-3"><div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center"><span class="iconify text-white/30" data-icon="mdi:domain"></span></div><div class="text-left"><div class="text-sm font-semibold">Knight Frank LLP</div><div class="text-[11px] text-white/20">Block Management</div></div></div></div>
+        </div>
+        <section class="py-20 md:py-28 px-6 md:px-12 lg:px-16 dot-bg relative" style="z-index:1">
+          <div class="light-bloom warm bloom-float-2" style="bottom:10%;right:10%;width:380px;height:380px;opacity:.35"></div>
+          <div class="max-w-5xl mx-auto relative z-10"><div class="mb-14 rv"><span class="eyebrow block mb-3">04 — More stories</span><h2 class="font-serif font-bold text-2xl md:text-4xl tracking-tight">What clients say.</h2></div>
+            <div class="grid md:grid-cols-2 gap-5">
+              <div class="qc bg-white rounded-2xl p-7 md:p-9 border border-navy/[.05] rv d1"><p class="font-serif text-base md:text-lg leading-relaxed text-navy/50 italic mb-7">"We switched from BT due to poor service. Now we pay less with better, local, always-available support."</p><div class="flex items-center gap-3 pt-4 border-t border-navy/[.05]"><div class="w-8 h-8 rounded-full bg-cream flex items-center justify-center"><span class="iconify text-muted text-sm" data-icon="mdi:office-building"></span></div><div><div class="text-[12px] font-semibold">Maunder Taylor</div><div class="text-[10px] text-muted">Property & Block Management</div></div></div></div>
+              <div class="qc bg-white rounded-2xl p-7 md:p-9 border border-navy/[.05] rv d2"><p class="font-serif text-base md:text-lg leading-relaxed text-navy/50 italic mb-7">"Managing 16 outlets — competitive pricing, single point of contact, 3-month rolling contracts. Excellent support."</p><div class="flex items-center gap-3 pt-4 border-t border-navy/[.05]"><div class="w-8 h-8 rounded-full bg-cream flex items-center justify-center"><span class="iconify text-muted text-sm" data-icon="mdi:store"></span></div><div><div class="text-[12px] font-semibold">Cash Converters</div><div class="text-[10px] text-muted">Retail — 16 Outlets</div></div></div></div>
+              <div class="qc bg-white rounded-2xl p-7 md:p-9 border border-navy/[.05] rv d3"><p class="font-serif text-base md:text-lg leading-relaxed text-navy/50 italic mb-7">"Improved our structure and cut telephony costs by about one-third. Strongly recommended."</p><div class="flex items-center gap-3 pt-4 border-t border-navy/[.05]"><div class="w-8 h-8 rounded-full bg-cream flex items-center justify-center"><span class="iconify text-muted text-sm" data-icon="mdi:eye-outline"></span></div><div><div class="text-[12px] font-semibold">Boots Opticians Franchise</div><div class="text-[10px] text-muted">Multi-Site Optician Group</div></div></div></div>
+              <div class="qc bg-white rounded-2xl p-7 md:p-9 border border-navy/[.05] rv d4"><p class="font-serif text-base md:text-lg leading-relaxed text-navy/50 italic mb-7">"A lift line was fixed with BT onsite next morning. Costs are lower, tenants are happy."</p><div class="flex items-center gap-3 pt-4 border-t border-navy/[.05]"><div class="w-8 h-8 rounded-full bg-cream flex items-center justify-center"><span class="iconify text-muted text-sm" data-icon="mdi:building"></span></div><div><div class="text-[12px] font-semibold">HML Hawksworth</div><div class="text-[10px] text-muted">Block Management</div></div></div></div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- ============== ABOUT ============== -->
+      <div class="page" data-page="about" id="page-about">
+        <svg class="curl-svg" viewBox="0 0 100 1000" preserveAspectRatio="none">
+          <path class="curl-path" pathLength="1" d="M 20,0 C 80,80 20,160 80,240 C 20,320 80,400 20,480 C 80,560 20,640 80,720 C 20,800 80,880 50,1000"/>
+          <circle class="curl-flash-ring flash-on-scroll" cx="50" cy="1000" r="3"/>
+          <circle class="curl-end flash-on-scroll" cx="50" cy="1000" r="2.5"/>
+        </svg>
+
+<div class="py-20 md:py-28 px-6 md:px-12 lg:px-16 dot-bg relative" style="z-index:1">
+          <div class="light-bloom lime bloom-float" style="top:15%;right:10%;width:340px;height:340px;opacity:.35"></div>
+          <div class="max-w-4xl mx-auto relative z-10">
+            <div class="grid md:grid-cols-5 gap-12 md:gap-16 items-start rv">
+              <div class="md:col-span-2 flex justify-center"><div class="relative fl"><div class="w-52 h-52 md:w-60 md:h-60 rounded-3xl overflow-hidden" style="box-shadow:var(--shadow-lg)"><img src="https://picsum.photos/seed/joanna-k3/460/460.jpg" alt="Joanna Koushi" class="w-full h-full object-cover"></div><div class="absolute -bottom-3 -right-3 bg-white rounded-xl px-4 py-2 flex items-center gap-2" style="box-shadow:var(--shadow-md)"><span class="w-2 h-2 rounded-full bg-lime pdot"></span><span class="text-[11px] font-bold tracking-tight">Director</span></div></div></div>
+              <div class="md:col-span-3">
+                <span class="eyebrow block mb-3">05 — People</span>
+                <h2 class="font-serif font-black text-3xl md:text-4xl tracking-[-.02em] leading-tight mb-5">Joanna Koushi</h2>
+                <p class="text-muted leading-relaxed mb-4 text-[15px]">Telecom specialist and director at Urbancoms. Deep knowledge across block management, construction, professional services and multi-site retail.</p>
+                <p class="text-muted leading-relaxed mb-8 text-[15px]">Non-committal analysis of your existing platform before recommending changes.</p>
+                <div class="flex flex-wrap gap-2">
+                  <span class="text-[10px] font-bold px-3 py-1.5 rounded-full bg-white text-muted border border-navy/[.06] hover:border-lime/30 hover:text-lime transition-colors cursor-default">VoIP & Cloud</span>
+                  <span class="text-[10px] font-bold px-3 py-1.5 rounded-full bg-white text-muted border border-navy/[.06] hover:border-lime/30 hover:text-lime transition-colors cursor-default">SOGEA / FTTP</span>
+                  <span class="text-[10px] font-bold px-3 py-1.5 rounded-full bg-white text-muted border border-navy/[.06] hover:border-lime/30 hover:text-lime transition-colors cursor-default">Fibre Ethernet</span>
+                  <span class="text-[10px] font-bold px-3 py-1.5 rounded-full bg-white text-muted border border-navy/[.06] hover:border-lime/30 hover:text-lime transition-colors cursor-default">Block Mgmt</span>
+                  <span class="text-[10px] font-bold px-3 py-1.5 rounded-full bg-white text-muted border-navy/[.06] hover:border-lime/30 hover:text-lime transition-colors cursor-default">CAT5/6</span>
+                  <span class="text-[10px] font-bold px-3 py-1.5 rounded-full bg-white text-muted border border-navy/[.06] hover:border-lime/30 hover:text-lime transition-colors cursor-default">Energy</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <section class="dark-section py-20 md:py-28 px-6 md:px-12 lg:px-16 bg-navy text-white relative" style="z-index:1">
+          <div class="max-w-4xl mx-auto relative z-10"><span class="sn text-[10px] font-medium uppercase tracking-[.2em] text-white/20 block mb-8 rv">Markets we serve</span>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div class="bg-white/[.04] rounded-2xl p-6 border border-white/[.05] text-center rv d1"><span class="iconify text-2xl text-lime/50 block mx-auto mb-3 ih" data-icon="mdi:office-building"></span><span class="text-[12px] font-semibold text-white/60">Block Management</span></div>
+              <div class="bg-white/[.04] rounded-2xl p-6 border border-white/[.05] text-center rv d2"><span class="iconify text-2xl text-lime/50 block mx-auto mb-3 ih" data-icon="mdi:crane"></span><span class="text-[12px] font-semibold text-white/60">Construction</span></div>
+              <div class="bg-white/[.04] rounded-2xl p-6 border border-white/[.05] text-center rv d3"><span class="iconify text-2xl text-lime/50 block mx-auto mb-3 ih" data-icon="mdi:calculator-variant"></span><span class="text-[12px] font-semibold text-white/60">Accountancy</span></div>
+              <div class="bg-white/[.04] rounded-2xl p-6 border border-white/[.05] text-center rv d4"><span class="iconify text-2xl text-lime/50 block mx-auto mb-3 ih" data-icon="mdi:store-multiple"></span><span class="text-[12px] font-semibold text-white/60">Multi-Site Retail</span></div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- ============== CONTACT ============== -->
+      <div class="page" data-page="contact" id="page-contact">
+        <svg class="curl-svg" viewBox="0 0 100 1000" preserveAspectRatio="none">
+          <path class="curl-path" pathLength="1" d="M 50,0 C 90,80 10,160 50,240 C 90,320 10,400 50,480 C 90,560 10,640 50,720 C 90,800 10,880 50,1000"/>
+          <circle class="curl-flash-ring flash-on-scroll" cx="50" cy="1000" r="3"/>
+          <circle class="curl-end flash-on-scroll" cx="50" cy="1000" r="2.5"/>
+        </svg>
+
+<div class="dark-section py-20 md:py-28 px-6 md:px-12 lg:px-16 bg-navy text-white min-h-screen relative" style="z-index:1">
+          <div class="light-bloom lime bloom-float" style="top:10%;left:10%;width:420px;height:420px;opacity:.25"></div>
+          <div class="light-bloom cool bloom-float-2" style="bottom:10%;right:5%;width:380px;height:380px;opacity:.2"></div>
+          <div class="max-w-5xl mx-auto relative z-10">
+            <div class="text-center max-w-xl mx-auto mb-14 rv"><span class="sn text-[10px] font-medium uppercase tracking-[.2em] text-white/20 block mb-3">06 — Contact</span><h2 class="font-serif font-black text-3xl md:text-5xl tracking-[-.02em] leading-tight mb-4">Let's talk.</h2><p class="text-white/35 text-[15px]">Free analysis. No commitment. No pressure.</p></div>
+            <div class="grid lg:grid-cols-5 gap-7">
+              <div class="lg:col-span-3 rv">
+                <form id="cf" class="bg-white/[.04] backdrop-blur-sm rounded-3xl p-7 md:p-8 border border-white/[.05] space-y-4">
+                  <div class="grid sm:grid-cols-2 gap-4"><div><label class="sn block text-[10px] font-medium uppercase tracking-[.12em] text-white/20 mb-1.5">Name *</label><input type="text" required placeholder="Your name" class="fi w-full bg-white/[.04] border border-white/[.07] rounded-xl px-4 py-3 text-sm text-white placeholder-white/[.1]"></div><div><label class="sn block text-[10px] font-medium uppercase tracking-[.12em] text-white/20 mb-1.5">Company</label><input type="text" placeholder="Company name" class="fi w-full bg-white/[.04] border border-white/[.07] rounded-xl px-4 py-3 text-sm text-white placeholder-white/[.1]"></div></div>
+                  <div class="grid sm:grid-cols-2 gap-4"><div><label class="sn block text-[10px] font-medium uppercase tracking-[.12em] text-white/20 mb-1.5">Email *</label><input type="email" required placeholder="you@company.co.uk" class="fi w-full bg-white/[.04] border border-white/[.07] rounded-xl px-4 py-3 text-sm text-white placeholder-white/[.1]"></div><div><label class="sn block text-[10px] font-medium uppercase tracking-[.12em] text-white/20 mb-1.5">Phone</label><input type="tel" placeholder="020 0000 0000" class="fi w-full bg-white/[.04] border border-white/[.07] rounded-xl px-4 py-3 text-sm text-white placeholder-white/[.1]"></div></div>
+                  <div><label class="sn block text-[10px] font-medium uppercase tracking-[.12em] text-white/20 mb-1.5">Sites</label><select class="fi sel-arrow w-full bg-white/[.04] border border-white/[.07] rounded-xl px-4 py-3 text-sm text-white/20"><option value="">Select...</option><option>1 site</option><option>2–5 sites</option><option>6–20 sites</option><option>20+ sites</option></select></div>
+                  <div><label class="sn block text-[10px] font-medium uppercase tracking-[.12em] text-white/20 mb-1.5">Tell us</label><textarea rows="4" placeholder="E.g. 12 residential blocks..." class="fi w-full bg-white/[.04] border border-white/[.07] rounded-xl px-4 py-3 text-sm text-white placeholder-white/[.1] resize-none"></textarea></div>
+                  <p class="text-[10px] text-white/[.08]">We'll only use your info to respond to this enquiry.</p>
+                  <button type="submit" class="btn-m w-full bg-lime text-navy font-bold text-sm py-4 rounded-full relative overflow-hidden" data-magnetic><span class="btn-inner relative z-10 justify-center gap-2">Send enquiry <span class="iconify" data-icon="mdi:arrow-right"></span></span></button>
+                </form>
+              </div>
+              <div class="lg:col-span-2 space-y-3 rv d2">
+                <a href="tel:02084451599" class="block bg-white/[.04] rounded-2xl p-5 border border-white/[.05] hover:border-lime/15 transition-colors group"><div class="flex items-start gap-3"><div class="w-9 h-9 rounded-xl bg-lime/10 flex items-center justify-center shrink-0"><span class="iconify text-lime" data-icon="mdi:phone"></span></div><div><div class="text-[13px] font-semibold mb-0.5 group-hover:text-lime transition-colors">020 8445 1599</div><p class="text-[10px] text-white/20">Mon–Fri, 9am–5:30pm</p></div></div></a>
+                <a href="mailto:support@urbancoms.co.uk" class="block bg-white/[.04] rounded-2xl p-5 border border-white/[.05] hover:border-lime/15 transition-colors group"><div class="flex items-start gap-3"><div class="w-9 h-9 rounded-xl bg-lime/10 flex items-center justify-center shrink-0"><span class="iconify text-lime" data-icon="mdi:email-outline"></span></div><div><div class="text-[13px] font-semibold mb-0.5 group-hover:text-lime transition-colors">support@urbancoms.co.uk</div><p class="text-[10px] text-white/20">Reply within 4 hours</p></div></div></a>
+                <div class="bg-white/[.04] rounded-2xl p-5 border border-white/[.05]"><div class="flex items-start gap-3"><div class="w-9 h-9 rounded-xl bg-lime/10 flex items-center justify-center shrink-0"><span class="iconify text-lime" data-icon="mdi:map-marker-outline"></span></div><div><div class="text-[13px] font-semibold mb-0.5">Office</div><p class="text-white/20 text-[12px]">1 Kings Avenue<br>London, N21 3NA</p></div></div></div>
+                <div class="bg-lime/[.06] rounded-2xl p-5 border border-lime/10"><div class="flex items-center gap-2 mb-2"><span class="iconify text-lime" data-icon="mdi:shield-check-outline"></span><span class="text-[12px] font-bold">Free bill analysis</span></div><p class="text-[11px] text-white/25 leading-relaxed">Send us your bills — we'll identify savings at zero cost.</p></div>
+              </div>
+            </div>
+          </div>
+          <div class="max-w-5xl mx-auto mt-14 pt-8 border-t border-white/[.04] flex flex-col sm:flex-row items-center justify-between gap-4 relative z-10"><p class="text-[11px] text-white/[.08]">&copy; 2025 Urbancoms Ltd. 1 Kings Avenue, London, N21 3NA.</p><div class="flex items-center gap-4"><a href="#" class="text-white/10 hover:text-white transition-colors"><span class="iconify text-lg" data-icon="mdi:linkedin"></span></a><a href="#" class="text-white/10 hover:text-white transition-colors"><span class="iconify text-lg" data-icon="mdi:twitter"></span></a></div></div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<div id="toast" class="toast fixed bottom-6 right-6 z-[200] bg-cream rounded-2xl px-6 py-4 flex items-center gap-3 max-w-sm" style="box-shadow:var(--shadow-lg),0 0 30px rgba(200,255,0,.2)">
+  <span class="iconify text-lime text-xl" data-icon="mdi:check-circle"></span>
+  <div><div class="text-[13px] font-bold text-navy">Enquiry sent</div><div class="text-[11px] text-muted">We'll be in touch within 4 hours.</div></div>
+</div>
+
+<script>
+/* ============================================================
+   URBANCOMS — APPLICATION SCRIPT
+   Organised into IIFE modules with clear concerns.
+   Modules:
+     1. CursorModule      — custom cursor + glow halo + spotlight
+     2. BackgroundModule  — interactive animated dot network
+     3. HeroNetworkModule — hero canvas (kept from original)
+     4. ScrollRailModule  — right-side progress rail
+     5. CurlingLineModule — per-page SVG line that draws on scroll
+     6. PinStackModule    — scroll-pinned card section (key feature)
+     7. RevealModule      — IntersectionObserver reveals + counters
+     8. TabModule         — page switching + tab indicator
+     9. ScrambleModule    — hover scramble text
+    10. FormModule        — contact form + toast
+   ============================================================ */
+
+/* ---------- 0. LOADING SCREEN ----------------------------- */
+/* Shows a branded loader on first paint, animates a progress
+   ring while fonts/assets settle, then fades out. Real progress
+   is driven by document load + font load events; a minimum
+   display time ensures the brand moment lands. */
+var LoaderModule = (function(){
+  var loader = document.getElementById('loader');
+  var progressEl = document.getElementById('loaderProgress');
+  var pctEl = document.getElementById('loaderPct');
+  if(!loader) return { done: function(){} };
+
+  var CIRCUMFERENCE = 1; // pathLength=1 normalised
+  var displayed = 0;     // 0..1, animated toward target
+  var target = 0;        // 0..1, set by load events
+  var minTimeMet = false;
+  var done = false;
+  var startTime = performance.now();
+  var MIN_DISPLAY_MS = 900;
+
+  // Minimum display timer
+  setTimeout(function(){ minTimeMet = true; }, MIN_DISPLAY_MS);
+
+  // Progress from actual load events
+  function setTarget(v){ target = Math.max(target, v); }
+
+  if(document.readyState === 'complete'){
+    setTarget(0.7);
+  } else {
+    window.addEventListener('load', function(){ setTarget(0.7); });
+    document.addEventListener('DOMContentLoaded', function(){ setTarget(0.4); });
+  }
+
+  // Fonts loaded → near-complete
+  if(document.fonts && document.fonts.ready){
+    document.fonts.ready.then(function(){ setTarget(0.9); });
+  } else {
+    setTimeout(function(){ setTarget(0.9); }, 600);
+  }
+
+  // Animate displayed progress toward target
+  function tick(){
+    displayed += (target - displayed) * 0.12;
+    if(Math.abs(target - displayed) < 0.002) displayed = target;
+
+    var remaining = 1 - displayed;
+    if(progressEl){
+      progressEl.style.strokeDashoffset = remaining.toString();
+    }
+    if(pctEl){
+      pctEl.textContent = Math.round(displayed * 100) + '%';
+    }
+
+    // Finish when target is high enough, min time met, and displayed caught up
+    if(target >= 0.9 && minTimeMet && displayed >= 0.95 && !done){
+      done = true;
+      // Snap to 100%
+      if(progressEl) progressEl.style.strokeDashoffset = '0';
+      if(pctEl) pctEl.textContent = '100%';
+      // Tiny delay so 100% is visible, then fade out
+      setTimeout(function(){
+        loader.classList.add('done');
+      }, 180);
+      return;
+    }
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+
+  // Safety: force-dismiss after 5s no matter what
+  setTimeout(function(){
+    if(!done){
+      done = true;
+      loader.classList.add('done');
+    }
+  }, 5000);
+
+  return { done: function(){ done = true; loader.classList.add('done'); } };
+})();
+
+/* ---------- 1. CURSOR ------------------------------------- */
+var CursorModule = (function(){
+  var dot = document.getElementById('cDot');
+  var ring = document.getElementById('cRing');
+  var glow = document.getElementById('cGlow');
+  var mx = -100, my = -100;
+  var rx = -100, ry = -100;        // ring (lerped)
+  var gx = -100, gy = -100;        // glow (slower lerp)
+  var HOVER_SEL = 'a,button,input,textarea,select,.stab,.mtab,.ft,.qc,.si,.btn-m,.logo-link,.ih,.pin-card,.pin-dot';
+
+  // Use passive mousemove for perf
+  document.addEventListener('mousemove', function(e){ mx = e.clientX; my = e.clientY; }, { passive: true });
+
+  function loop(){
+    // Use translate3d for GPU compositing (avoids layout reflow)
+    rx += (mx - rx) * 0.25;
+    ry += (my - ry) * 0.25;
+    gx += (mx - gx) * 0.12;
+    gy += (my - gy) * 0.12;
+    dot.style.transform = 'translate3d(' + mx + 'px,' + my + 'px,0) translate(-50%,-50%)';
+    ring.style.transform = 'translate3d(' + rx + 'px,' + ry + 'px,0) translate(-50%,-50%)';
+    if(glow) glow.style.transform = 'translate3d(' + gx + 'px,' + gy + 'px,0) translate(-50%,-50%)';
+    requestAnimationFrame(loop);
+  }
+  loop();
+
+  function setHover(on){
+    dot.classList.toggle('h', on);
+    ring.classList.toggle('h', on);
+    if(glow) glow.classList.toggle('h', on);
+  }
+  document.addEventListener('mouseover', function(e){
+    if(e.target.closest(HOVER_SEL)) setHover(true);
+  }, { passive: true });
+  document.addEventListener('mouseout', function(e){
+    if(e.target.closest(HOVER_SEL)) setHover(false);
+  }, { passive: true });
+
+  // Magnetic buttons (throttled via rAF)
+  document.querySelectorAll('[data-magnetic]').forEach(function(b){
+    var pending = false, px = 0, py = 0;
+    b.addEventListener('mousemove', function(e){
+      var r = b.getBoundingClientRect();
+      px = (e.clientX - r.left - r.width/2) * 0.22;
+      py = (e.clientY - r.top - r.height/2) * 0.22;
+      if(pending) return;
+      pending = true;
+      requestAnimationFrame(function(){
+        var inner = b.querySelector('.btn-inner');
+        if(inner) inner.style.transform = 'translate(' + px + 'px,' + py + 'px)';
+        pending = false;
+      });
+    });
+    b.addEventListener('mouseleave', function(){
+      var inner = b.querySelector('.btn-inner');
+      if(inner) inner.style.transform = 'translate(0,0)';
+    });
+  });
+
+  return { setHover: setHover };
+})();
+
+/* ---------- 2. BACKGROUND CANVAS (optimised) ------------- */
+/* Performance strategy:
+   - Pre-rendered glow sprite (no per-frame createRadialGradient)
+   - Capped particle count (~50) to keep O(n²) connection check cheap
+   - Cursor attraction only active near top of page (hero area)
+   - Animation pauses when background is hidden by dark sections
+   - Reuses a single path batch for lines where possible */
+var BackgroundModule = (function(){
+  var canvas = document.getElementById('bgCanvas');
+  if(!canvas) return { setActive: function(){} };
+  var ctx = canvas.getContext('2d', { alpha: true });
+  var W = 0, H = 0;
+  var DPR = Math.min(window.devicePixelRatio || 1, 1.5);
+  var particles = [];
+  var mouse = { x: -1000, y: -1000 };
+  var LINK_DIST = 145;
+  var LINK_DIST_SQ = LINK_DIST * LINK_DIST;
+  var CURSOR_DIST = 210;
+  var CURSOR_DIST_SQ = CURSOR_DIST * CURSOR_DIST;
+  var mainEl = document.getElementById('mainEl');
+  var active = true;            // whether the bg is visible (not under a dark section)
+  var attractEnabled = true;    // whether cursor attraction should run
+  var rafId = null;
+
+  // Pre-render the glow sprite once (huge perf win vs. per-frame gradients)
+  var SPRITE_SIZE = 48;
+  var glowSprite = null;
+  function buildSprite(){
+    glowSprite = document.createElement('canvas');
+    glowSprite.width = SPRITE_SIZE;
+    glowSprite.height = SPRITE_SIZE;
+    var sctx = glowSprite.getContext('2d');
+    var half = SPRITE_SIZE / 2;
+    var g = sctx.createRadialGradient(half, half, 0, half, half, half);
+    g.addColorStop(0, 'rgba(11,20,38,0.55)');
+    g.addColorStop(0.4, 'rgba(11,20,38,0.18)');
+    g.addColorStop(1, 'rgba(11,20,38,0)');
+    sctx.fillStyle = g;
+    sctx.fillRect(0, 0, SPRITE_SIZE, SPRITE_SIZE);
+  }
+
+  function resize(){
+    W = window.innerWidth;
+    H = window.innerHeight;
+    canvas.width = W * DPR;
+    canvas.height = H * DPR;
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    // Cap particle count for performance (~35 on desktop, fewer on mobile)
+    var count = Math.min(35, Math.max(15, Math.floor((W * H) / 42000)));
+    particles = [];
+    for(var i = 0; i < count; i++){
+      particles.push({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        vx: (Math.random() - 0.5) * 0.4,
+        vy: (Math.random() - 0.5) * 0.4,
+        r: 1 + Math.random() * 1.8,
+        baseOpacity: 0.30 + Math.random() * 0.30,
+        phase: Math.random() * Math.PI * 2,
+        spriteSize: 0  // set below
+      });
+    }
+    // Pre-compute sprite draw size per particle (r * 6)
+    for(var i = 0; i < particles.length; i++){
+      particles[i].spriteSize = particles[i].r * 6;
+    }
+  }
+
+  // Track cursor + whether we're in the hero (top of any page)
+  document.addEventListener('mousemove', function(e){
+    mouse.x = e.clientX; mouse.y = e.clientY;
+  });
+  document.addEventListener('mouseleave', function(){
+    mouse.x = -1000; mouse.y = -1000;
+  });
+
+  // Detect whether the background is currently visible (not hidden
+  // behind a dark section). We use a cached lookup of dark-section
+  // positions (much cheaper than elementFromPoint on every scroll).
+  var darkRanges = []; // [{start, end}] in scroll-top coordinates
+  function cacheDarkRanges(){
+    darkRanges = [];
+    if(!mainEl) return;
+    var darkEls = mainEl.querySelectorAll('.bg-navy, .dark-section');
+    darkEls.forEach(function(el){
+      // offsetTop is relative to the main scrolling container
+      var top = el.offsetTop;
+      var height = el.offsetHeight;
+      // Expand by one viewport so we don't pop in/out at edges
+      var vh = mainEl.clientHeight;
+      darkRanges.push({start: top - vh, end: top + height + vh});
+    });
+  }
+  function checkVisibility(){
+    if(!mainEl) return;
+    var scrollTop = mainEl.scrollTop;
+    var viewportH = mainEl.clientHeight;
+    // Is the current scroll position inside any dark range?
+    var isDark = false;
+    for(var i = 0; i < darkRanges.length; i++){
+      if(scrollTop >= darkRanges[i].start && scrollTop <= darkRanges[i].end){
+        isDark = true;
+        break;
+      }
+    }
+    active = !isDark;
+
+    // Cursor attraction only when in the top ~80% of the first viewport
+    // (i.e. the hero area). Disable once user scrolls into content.
+    attractEnabled = scrollTop < viewportH * 0.8;
+  }
+
+  function draw(t){
+    if(!W || !active){
+      // Still keep the loop alive so we can resume, but skip the heavy work
+      rafId = requestAnimationFrame(draw);
+      return;
+    }
+
+    ctx.clearRect(0, 0, W, H);
+
+    var n = particles.length;
+    var useMouse = mouse.x > -500;
+    var doAttract = useMouse && attractEnabled;
+
+    // Update positions
+    for(var i = 0; i < n; i++){
+      var p = particles[i];
+      p.x += p.vx; p.y += p.vy;
+      if(p.x < -30) p.x = W + 30;
+      else if(p.x > W + 30) p.x = -30;
+      if(p.y < -30) p.y = H + 30;
+      else if(p.y > H + 30) p.y = -30;
+
+      // Cursor attraction — only in hero area
+      if(doAttract){
+        var dx = mouse.x - p.x, dy = mouse.y - p.y;
+        var d2 = dx*dx + dy*dy;
+        if(d2 < CURSOR_DIST_SQ){
+          var d = Math.sqrt(d2);
+          var force = (CURSOR_DIST - d) / CURSOR_DIST;
+          p.x += (dx / Math.max(d, 1)) * force * 0.5;
+          p.y += (dy / Math.max(d, 1)) * force * 0.5;
+        }
+      }
+    }
+
+    // Draw inter-particle connections (batch by opacity buckets for fewer strokes)
+    // We use 3 opacity buckets to reduce strokeStyle changes.
+    ctx.lineWidth = 0.8;
+    var buckets = [[], [], []]; // near, mid, far
+    for(var i = 0; i < n; i++){
+      var a = particles[i];
+      for(var j = i + 1; j < n; j++){
+        var b = particles[j];
+        var dx = a.x - b.x, dy = a.y - b.y;
+        var d2 = dx*dx + dy*dy;
+        if(d2 < LINK_DIST_SQ){
+          var d = Math.sqrt(d2);
+          var ratio = 1 - d / LINK_DIST;
+          var bucket = ratio > 0.66 ? 0 : (ratio > 0.33 ? 1 : 2);
+          buckets[bucket].push(a.x, a.y, b.x, b.y);
+        }
+      }
+    }
+    var opacities = [0.42, 0.28, 0.14];
+    for(var bi = 0; bi < 3; bi++){
+      var arr = buckets[bi];
+      if(arr.length === 0) continue;
+      ctx.strokeStyle = 'rgba(11,20,38,' + opacities[bi] + ')';
+      ctx.beginPath();
+      for(var k = 0; k < arr.length; k += 4){
+        ctx.moveTo(arr[k], arr[k+1]);
+        ctx.lineTo(arr[k+2], arr[k+3]);
+      }
+      ctx.stroke();
+    }
+
+    // Draw cursor connections (lime, bright) — only when attracting
+    if(doAttract){
+      ctx.strokeStyle = 'rgba(200,255,0,0.7)';
+      ctx.lineWidth = 1.3;
+      ctx.beginPath();
+      for(var i = 0; i < n; i++){
+        var p = particles[i];
+        var dx = mouse.x - p.x, dy = mouse.y - p.y;
+        var d2 = dx*dx + dy*dy;
+        if(d2 < CURSOR_DIST_SQ){
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(mouse.x, mouse.y);
+        }
+      }
+      ctx.stroke();
+    }
+
+    // Draw particles using pre-rendered glow sprite (very fast)
+    for(var i = 0; i < n; i++){
+      var p = particles[i];
+      var pulse = 0.82 + 0.18 * Math.sin(t * 0.001 + p.phase);
+      // Glow halo via drawImage (fast)
+      var sz = p.spriteSize * pulse;
+      ctx.globalAlpha = Math.min(1, p.baseOpacity * pulse);
+      ctx.drawImage(glowSprite, p.x - sz/2, p.y - sz/2, sz, sz);
+    }
+    ctx.globalAlpha = 1;
+
+    // Core dots — single batched fill
+    ctx.fillStyle = 'rgba(11,20,38,0.7)';
+    ctx.beginPath();
+    for(var i = 0; i < n; i++){
+      var p = particles[i];
+      ctx.moveTo(p.x + p.r, p.y);
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    }
+    ctx.fill();
+
+    rafId = requestAnimationFrame(draw);
+  }
+
+  if(!window.matchMedia || !window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+    buildSprite();
+    resize();
+    cacheDarkRanges();
+    rafId = requestAnimationFrame(draw);
+    var rt;
+    window.addEventListener('resize', function(){ clearTimeout(rt); rt = setTimeout(function(){ buildSprite(); resize(); cacheDarkRanges(); }, 200); });
+    // Re-check visibility on scroll
+    if(mainEl){
+      mainEl.addEventListener('scroll', checkVisibility, { passive: true });
+      checkVisibility();
+    }
+    // Re-cache dark ranges when switching tabs (content changes)
+    window.addEventListener('tabchange', function(){ cacheDarkRanges(); checkVisibility(); });
+  }
+  return { setActive: function(v){ active = v; }, refreshRanges: cacheDarkRanges };
+})();
+
+/* ---------- 3. HERO NETWORK CANVAS (more balls + sticks + interactive) -- */
+/* A denser network: ~40 nodes in 2 rings + scattered, multiple connection
+   layers (hub spokes, ring perimeter, cross-links), traveling particles
+   along every link, and cursor interaction — nodes near the cursor brighten
+   and a temporary link is drawn to the cursor itself. Performance is kept
+   in check with a pre-rendered glow sprite and batched strokes. */
+var HeroNetworkModule = (function(){
+  var nc = document.getElementById('netCanvas');
+  if(!nc) return;
+  var ctx = nc.getContext('2d', { alpha: true });
+  var nodes = [], parts = [], ncW = 0, ncH = 0;
+  var mouse = { x: -1000, y: -1000, active: false };
+  var DPR = Math.min(window.devicePixelRatio || 1, 1.5);
+
+  // Pre-rendered glow sprite (lime) for node halos
+  var SPRITE = 40;
+  var glowSprite = null;
+  function buildSprite(){
+    glowSprite = document.createElement('canvas');
+    glowSprite.width = SPRITE; glowSprite.height = SPRITE;
+    var s = glowSprite.getContext('2d');
+    var h = SPRITE / 2;
+    var g = s.createRadialGradient(h, h, 0, h, h, h);
+    g.addColorStop(0, 'rgba(200,255,0,0.55)');
+    g.addColorStop(0.35, 'rgba(200,255,0,0.18)');
+    g.addColorStop(1, 'rgba(200,255,0,0)');
+    s.fillStyle = g;
+    s.fillRect(0, 0, SPRITE, SPRITE);
+  }
+
+  function init(){
+    var r = nc.parentElement.getBoundingClientRect();
+    ncW = r.width;
+    ncH = r.height;
+    nc.width = ncW * DPR;
+    nc.height = ncH * DPR;
+    nc.style.width = ncW + 'px';
+    nc.style.height = ncH + 'px';
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+
+    nodes = [];
+    // Central hub
+    nodes.push({ x: ncW * 0.5, y: ncH * 0.5, r: 9, fixed: true, hub: true });
+    // Inner ring — 8 nodes
+    var innerCount = 8, innerR = Math.min(ncW, ncH) * 0.18;
+    for(var i = 0; i < innerCount; i++){
+      var a = (i / innerCount) * Math.PI * 2 - Math.PI / 2;
+      nodes.push({
+        x: ncW * 0.5 + Math.cos(a) * innerR,
+        y: ncH * 0.5 + Math.sin(a) * innerR,
+        r: 3.5
+      });
+    }
+    // Outer ring — 14 nodes
+    var outerCount = 14, outerR = Math.min(ncW, ncH) * 0.38;
+    for(var i = 0; i < outerCount; i++){
+      var a = (i / outerCount) * Math.PI * 2;
+      nodes.push({
+        x: ncW * 0.5 + Math.cos(a) * outerR,
+        y: ncH * 0.5 + Math.sin(a) * outerR,
+        r: 2.8
+      });
+    }
+    // Scattered nodes — 16 more for density
+    for(var i = 0; i < 16; i++){
+      nodes.push({
+        x: ncW * (0.1 + Math.random() * 0.8),
+        y: ncH * (0.1 + Math.random() * 0.8),
+        r: 1.8 + Math.random() * 1.4
+      });
+    }
+
+    // Animate non-fixed nodes with floating motion
+    nodes.forEach(function(n){
+      if(!n.fixed){
+        n.ox = n.x; n.oy = n.y;
+        n.ph = Math.random() * Math.PI * 2;
+        n.sp = 0.25 + Math.random() * 0.45;
+        n.am = 6 + Math.random() * 14;
+      }
+    });
+
+    // Build connection list:
+    // 1) Hub → every inner ring node
+    // 2) Hub → every outer ring node (spokes)
+    // 3) Inner ring perimeter (consecutive)
+    // 4) Outer ring perimeter (consecutive)
+    // 5) Cross-links: a few inner↔outer pairs
+    // 6) Each scattered node → its nearest ring node
+    var links = [];
+    var innerStart = 1, innerEnd = innerCount;          // indices 1..8
+    var outerStart = innerEnd + 1, outerEnd = outerStart + outerCount - 1; // 9..22
+    var scatterStart = outerEnd + 1;                     // 23..38
+
+    // Hub spokes (inner + outer)
+    for(var i = innerStart; i <= outerEnd; i++){
+      links.push([0, i]);
+    }
+    // Inner ring perimeter
+    for(var i = 0; i < innerCount; i++){
+      links.push([innerStart + i, innerStart + (i + 1) % innerCount]);
+    }
+    // Outer ring perimeter
+    for(var i = 0; i < outerCount; i++){
+      links.push([outerStart + i, outerStart + (i + 1) % outerCount]);
+    }
+    // Cross-links: every other inner → corresponding outer
+    for(var i = 0; i < innerCount; i++){
+      if(i % 2 === 0){
+        var outerIdx = outerStart + Math.floor(i * outerCount / innerCount);
+        links.push([innerStart + i, outerIdx]);
+      }
+    }
+    // Scattered nodes → nearest ring node
+    for(var i = scatterStart; i < nodes.length; i++){
+      var best = -1, bestD = Infinity;
+      for(var j = 1; j <= outerEnd; j++){
+        var dx = nodes[i].ox - nodes[j].ox, dy = nodes[i].oy - nodes[j].oy;
+        var d = dx * dx + dy * dy;
+        if(d < bestD){ bestD = d; best = j; }
+      }
+      if(best > 0) links.push([i, best]);
+      // Also link a few scattered nodes to each other
+      if(i > scatterStart && (i - scatterStart) % 3 === 0){
+        links.push([i, i - 1]);
+      }
+    }
+
+    // Traveling particles: 2 per link for hub spokes, 1 for others
+    parts = [];
+    links.forEach(function(L){
+      var isHubSpoke = L[0] === 0 || L[1] === 0;
+      var count = isHubSpoke ? 2 : 1;
+      for(var j = 0; j < count; j++){
+        parts.push({
+          f: L[0], t: L[1],
+          p: Math.random(),
+          s: (isHubSpoke ? 0.003 : 0.0018) + Math.random() * 0.003,
+          fromHub: L[0] === 0
+        });
+      }
+    });
+
+    // Stash links on the module for drawing
+    heroLinks = links;
+  }
+
+  var heroLinks = [];
+
+  // Cursor tracking (canvas-relative)
+  function onMove(e){
+    var r = nc.getBoundingClientRect();
+    mouse.x = e.clientX - r.left;
+    mouse.y = e.clientY - r.top;
+    mouse.active = mouse.x >= 0 && mouse.x <= ncW && mouse.y >= 0 && mouse.y <= ncH;
+  }
+  function onLeave(){
+    mouse.active = false;
+    mouse.x = -1000; mouse.y = -1000;
+  }
+  document.addEventListener('mousemove', onMove, { passive: true });
+  nc.parentElement.addEventListener('mouseleave', onLeave);
+
+  // Only run when the hero is actually visible (perf)
+  var active = true;
+  var mainEl = document.getElementById('mainEl');
+  function checkActive(){
+    if(!mainEl) return;
+    // Hero is the first section; active when scrollTop < viewport height
+    active = mainEl.scrollTop < mainEl.clientHeight * 0.9;
+  }
+  if(mainEl){
+    mainEl.addEventListener('scroll', checkActive, { passive: true });
+    checkActive();
+  }
+
+  function draw(t){
+    if(!ncW) { requestAnimationFrame(draw); return; }
+    if(!active){ requestAnimationFrame(draw); return; }
+
+    ctx.clearRect(0, 0, ncW, ncH);
+
+    // Update node positions (floating)
+    for(var i = 0; i < nodes.length; i++){
+      var n = nodes[i];
+      if(!n.fixed){
+        n.x = n.ox + Math.sin(t * 0.001 * n.sp + n.ph) * n.am;
+        n.y = n.oy + Math.cos(t * 0.001 * n.sp * 0.7 + n.ph) * n.am * 0.6;
+      }
+    }
+
+    // Compute cursor proximity for each node (for brightening)
+    var proximity = new Array(nodes.length);
+    if(mouse.active){
+      var CURSOR_R = 180;
+      for(var i = 0; i < nodes.length; i++){
+        var dx = mouse.x - nodes[i].x, dy = mouse.y - nodes[i].y;
+        var d2 = dx * dx + dy * dy;
+        proximity[i] = d2 < CURSOR_R * CURSOR_R ? 1 - Math.sqrt(d2) / CURSOR_R : 0;
+      }
+    } else {
+      for(var i = 0; i < nodes.length; i++) proximity[i] = 0;
+    }
+
+    // Draw all static links, batched by brightness tier
+    // Tier 0: dim perimeter, Tier 1: spokes, Tier 2: hub-adjacent
+    ctx.lineWidth = 1;
+    var tiers = [[], [], []];
+    for(var i = 0; i < heroLinks.length; i++){
+      var L = heroLinks[i];
+      var isSpoke = L[0] === 0 || L[1] === 0;
+      // Brighten if either endpoint is near cursor
+      var boost = Math.max(proximity[L[0]], proximity[L[1]]);
+      var tier = isSpoke ? 1 : 0;
+      if(boost > 0.3) tier = 2;
+      tiers[tier].push(L[0], L[1], boost);
+    }
+    var tierStyles = [
+      'rgba(200,255,0,0.05)',
+      'rgba(200,255,0,0.12)',
+      'rgba(200,255,0,0.35)'
+    ];
+    for(var ti = 0; ti < 3; ti++){
+      var arr = tiers[ti];
+      if(arr.length === 0) continue;
+      ctx.strokeStyle = tierStyles[ti];
+      ctx.lineWidth = ti === 2 ? 1.4 : 1;
+      ctx.beginPath();
+      for(var k = 0; k < arr.length; k += 3){
+        var a = nodes[arr[k]], b = nodes[arr[k + 1]];
+        ctx.moveTo(a.x, a.y);
+        ctx.lineTo(b.x, b.y);
+      }
+      ctx.stroke();
+    }
+
+    // Draw cursor → nearest nodes (interactive links)
+    if(mouse.active){
+      ctx.strokeStyle = 'rgba(200,255,0,0.55)';
+      ctx.lineWidth = 1.3;
+      ctx.beginPath();
+      for(var i = 0; i < nodes.length; i++){
+        if(proximity[i] > 0.15){
+          ctx.moveTo(nodes[i].x, nodes[i].y);
+          ctx.lineTo(mouse.x, mouse.y);
+        }
+      }
+      ctx.stroke();
+    }
+
+    // Draw traveling particles
+    for(var i = 0; i < parts.length; i++){
+      var p = parts[i];
+      p.p += p.s;
+      if(p.p > 1) p.p -= 1;
+      var a = nodes[p.f], b = nodes[p.t];
+      var px = a.x + (b.x - a.x) * p.p;
+      var py = a.y + (b.y - a.y) * p.p;
+      // Brighten if near cursor
+      var pBoost = 0;
+      if(mouse.active){
+        var dx = mouse.x - px, dy = mouse.y - py;
+        var d = Math.sqrt(dx * dx + dy * dy);
+        if(d < 120) pBoost = 1 - d / 120;
+      }
+      ctx.beginPath();
+      ctx.arc(px, py, 1.4 + pBoost * 0.8, 0, Math.PI * 2);
+      ctx.fillStyle = p.fromHub
+        ? 'rgba(200,255,0,' + (0.55 + pBoost * 0.4) + ')'
+        : 'rgba(200,255,0,' + (0.22 + pBoost * 0.4) + ')';
+      ctx.fill();
+    }
+
+    // Draw node glow halos (pre-rendered sprite — fast)
+    for(var i = 0; i < nodes.length; i++){
+      var n = nodes[i];
+      var boost = proximity[i] || 0;
+      var baseOp = n.hub ? 0.55 : (n.r > 3 ? 0.32 : 0.20);
+      var op = Math.min(1, baseOp + boost * 0.5);
+      var sz = (n.hub ? n.r * 6 : n.r * 5) * (1 + boost * 0.4);
+      ctx.globalAlpha = op;
+      ctx.drawImage(glowSprite, n.x - sz / 2, n.y - sz / 2, sz, sz);
+    }
+    ctx.globalAlpha = 1;
+
+    // Draw node cores (batched)
+    for(var i = 0; i < nodes.length; i++){
+      var n = nodes[i];
+      var boost = proximity[i] || 0;
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, n.r * (1 + boost * 0.3), 0, Math.PI * 2);
+      if(n.hub){
+        ctx.fillStyle = 'rgba(200,255,0,' + (0.4 + boost * 0.4) + ')';
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(200,255,0,' + (0.6 + boost * 0.3) + ')';
+        ctx.lineWidth = 1.8;
+        ctx.stroke();
+      } else {
+        ctx.fillStyle = 'rgba(200,255,0,' + (0.25 + boost * 0.5) + ')';
+        ctx.fill();
+      }
+    }
+
+    // Hub label
+    ctx.font = 'bold 9px "JetBrains Mono",monospace';
+    ctx.fillStyle = 'rgba(200,255,0,0.4)';
+    ctx.textAlign = 'center';
+    ctx.fillText('URBANCOMS', nodes[0].x, nodes[0].y + 24);
+
+    requestAnimationFrame(draw);
+  }
+
+  buildSprite();
+  init();
+  requestAnimationFrame(draw);
+  var rt;
+  window.addEventListener('resize', function(){
+    clearTimeout(rt);
+    rt = setTimeout(function(){ buildSprite(); init(); }, 150);
+  });
+  return {};
+})();
+
+/* ---------- 4. SCROLL RAIL (right side) ------------------ */
+var ScrollRailModule = (function(){
+  var mainEl = document.getElementById('mainEl');
+  var fill = document.getElementById('srFill');
+  var dot = document.getElementById('srDot');
+  var ticks = document.querySelectorAll('.sr-tick');
+
+  function update(){
+    var s = mainEl.scrollHeight - mainEl.clientHeight;
+    var p = s > 0 ? mainEl.scrollTop / s : 0;
+    var pct = p * 100;
+    fill.style.height = pct + '%';
+    dot.style.top = pct + '%';
+    ticks.forEach(function(t){
+      t.classList.toggle('lit', pct >= parseInt(t.dataset.pos));
+    });
+    // Hero parallax
+    var ht = document.getElementById('heroText');
+    if(ht && TabModule.active === 'home'){
+      ht.style.transform = 'translateY(' + mainEl.scrollTop * 0.1 + 'px)';
+    }
+  }
+  mainEl.addEventListener('scroll', update, { passive: true });
+  return { update: update };
+})();
+
+/* ---------- 5. CURLING SCROLL LINE — REMOVED for performance ----------
+   The per-frame stroke-dashoffset updates + lightBurst animations were
+   a major source of scroll jank. Removed entirely. The scroll rail on
+   the right side now carries the progress indication alone. */
+var CurlingLineModule = { update: function(){}, reset: function(){} };
+
+/* ---------- 6. PIN STACK (scroll-pinned cards) ----------- */
+/* The section uses CSS sticky positioning so that scrolling
+   through the tall wrapper translates the card track. We
+   lerp the actual transform toward the target for smoothness.
+   After the final card, sticky releases and normal page
+   scrolling continues automatically. */
+var PinStackModule = (function(){
+  var mainEl = document.getElementById('mainEl');
+  var section = document.querySelector('.pin-section');
+  if(!section) return { reset: function(){}, recalc: function(){} };
+  var track = document.getElementById('pinTrack');
+  var cards = section.querySelectorAll('.pin-card');
+  var dots = section.querySelectorAll('.pin-dot');
+  var hint = document.getElementById('pinHint');
+  var numCards = cards.length;
+  var current = 0, target = 0, activeIdx = -1;
+
+  function isHidden(el){ return el.offsetParent === null; }
+
+  function calcTarget(){
+    if(isHidden(section)){ target = 0; return; }
+    var r = section.getBoundingClientRect();
+    var mr = mainEl.getBoundingClientRect();
+    var sectionTop = r.top - mr.top;
+    var scrollable = section.offsetHeight - mainEl.clientHeight;
+    if(scrollable <= 0){ target = 0; return; }
+    target = Math.max(0, Math.min(1, -sectionTop / scrollable));
+  }
+
+  // Only run the lerp loop when the pin section is in view (perf)
+  var rafId = null;
+  var isRunning = false;
+
+  function isInView(){
+    if(isHidden(section)) return false;
+    var r = section.getBoundingClientRect();
+    // Section is "in view" if any part of it intersects the viewport
+    return r.bottom > 0 && r.top < window.innerHeight;
+  }
+
+  function loop(){
+    // Snappier lerp for more responsive feel
+    current += (target - current) * 0.18;
+    if(Math.abs(target - current) < 0.0003) current = target;
+
+    var offset = -current * (numCards - 1) * 100;
+    track.style.transform = 'translate3d(0,' + offset + 'vh,0)';
+
+    var idx = Math.round(current * (numCards - 1));
+    // Clamp idx to valid range
+    if(idx < 0) idx = 0;
+    if(idx > numCards - 1) idx = numCards - 1;
+    if(idx !== activeIdx){
+      activeIdx = idx;
+      cards.forEach(function(c, i){
+        c.classList.toggle('active', i === idx);
+        c.classList.toggle('past', i < idx);
+        c.classList.toggle('upcoming', i > idx);
+      });
+      dots.forEach(function(d, i){
+        d.classList.toggle('active', i === idx);
+      });
+      if(hint){
+        hint.style.opacity = idx > 0 ? '0' : '';
+      }
+    }
+    // Stop the loop when settled AND out of view (restarts on scroll)
+    if(!isInView() && Math.abs(target - current) < 0.0003){
+      isRunning = false;
+      rafId = null;
+      return;
+    }
+    rafId = requestAnimationFrame(loop);
+  }
+
+  function startLoop(){
+    if(isRunning) return;
+    isRunning = true;
+    rafId = requestAnimationFrame(loop);
+  }
+
+  function onScroll(){
+    calcTarget();
+    if(isInView()) startLoop();
+  }
+
+  mainEl.addEventListener('scroll', onScroll, { passive: true });
+  calcTarget();
+  // Set first card active immediately so it's visible when section enters
+  cards.forEach(function(c, i){
+    c.classList.toggle('active', i === 0);
+    c.classList.toggle('upcoming', i > 0);
+  });
+  activeIdx = 0;
+  // Start the loop only if pin section is in view at init (usually not)
+  if(isInView()) startLoop();
+
+  // Click-to-jump on dots
+  dots.forEach(function(d){
+    d.addEventListener('click', function(){
+      var i = parseInt(d.dataset.index);
+      var r = section.getBoundingClientRect();
+      var mr = mainEl.getBoundingClientRect();
+      var sectionTop = r.top - mr.top;
+      var scrollable = section.offsetHeight - mainEl.clientHeight;
+      var targetScroll = section.offsetTop + (i / (numCards - 1)) * scrollable;
+      mainEl.scrollTo({ top: targetScroll, behavior: 'smooth' });
+    });
+  });
+
+  return {
+    reset: function(){
+      current = 0; target = 0; activeIdx = -1;
+      cards.forEach(function(c){ c.classList.remove('active','past','upcoming'); });
+      dots.forEach(function(d, i){ d.classList.toggle('active', i === 0); });
+      cards.forEach(function(c, i){
+        c.classList.toggle('active', i === 0);
+        c.classList.toggle('upcoming', i > 0);
+      });
+      activeIdx = 0;
+      calcTarget();
+    },
+    recalc: function(){ calcTarget(); if(isInView()) startLoop(); }
+  };
+})();
+
+/* ---------- 7. REVEALS + COUNTERS ------------------------ */
+var RevealModule = (function(){
+  var observer = null;
+  var mainEl = document.getElementById('mainEl');
+
+  function init(){
+    if(observer) observer.disconnect();
+    observer = new IntersectionObserver(function(es){
+      es.forEach(function(e){
+        if(e.isIntersecting){
+          e.target.classList.add('v');
+          e.target.querySelectorAll('.ctr').forEach(function(c){
+            var t = parseInt(c.dataset.target);
+            if(t && !c.dataset.done){
+              c.dataset.done = '1';
+              animateCounter(c, t);
+            }
+          });
+        }
+      });
+    }, { threshold: 0.08, rootMargin: '0px 0px -8% 0px', root: mainEl });
+    var pg = document.querySelector('.page.active');
+    if(pg) pg.querySelectorAll('.rv,.rb').forEach(function(el){ observer.observe(el); });
+  }
+
+  function animateCounter(el, target){
+    var dur = 1500, st = performance.now();
+    (function u(now){
+      var p = Math.min((now - st) / dur, 1);
+      var e = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(target * e) + '+';
+      if(p < 1) requestAnimationFrame(u);
+    })(st);
+  }
+
+  return { init: init };
+})();
+
+/* ---------- 8. TABS -------------------------------------- */
+var TabModule = (function(){
+  var mainEl = document.getElementById('mainEl');
+  var tabInd = document.getElementById('tabInd');
+  var active = 'home';
+
+  function updateInd(){
+    var a = document.querySelector('.stab.active');
+    if(!a || !tabInd) return;
+    tabInd.style.top = a.offsetTop + 'px';
+    tabInd.style.height = a.offsetHeight + 'px';
+  }
+
+  function switchTo(tab){
+    if(tab === active) return;
+    var cur = document.getElementById('page-' + active);
+    var nxt = document.getElementById('page-' + tab);
+    if(!cur || !nxt) return;
+
+    cur.classList.remove('active','entering');
+    cur.querySelectorAll('.rv,.rb,.pin-card').forEach(function(el){ el.classList.remove('v','active','past','upcoming'); });
+    cur.querySelectorAll('.ctr').forEach(function(c){ delete c.dataset.done; c.textContent = '0+'; });
+
+    mainEl.scrollTop = 0;
+    // Reset scroll rail
+    var fill = document.getElementById('srFill');
+    var dot = document.getElementById('srDot');
+    var ticks = document.querySelectorAll('.sr-tick');
+    if(fill) fill.style.height = '0%';
+    if(dot) dot.style.top = '0%';
+    ticks.forEach(function(t){ t.classList.remove('lit'); });
+
+    nxt.classList.add('active','entering');
+    nxt.addEventListener('animationend', function h(){
+      nxt.removeEventListener('animationend', h);
+      nxt.classList.remove('entering');
+    });
+
+    document.querySelectorAll('.stab').forEach(function(b){ b.classList.toggle('active', b.dataset.tab === tab); });
+    document.querySelectorAll('.mtab').forEach(function(b){ b.classList.toggle('active', b.dataset.tab === tab); });
+    updateInd();
+
+    active = tab;
+    window.activeTab = tab;
+
+    if(tab === 'home'){
+      document.querySelectorAll('#page-home .hw-i').forEach(function(el){
+        el.style.animation = 'none'; el.offsetHeight; el.style.animation = '';
+      });
+    }
+
+    // Reset pin stack for the new page
+    if(PinStackModule.reset) PinStackModule.reset();
+
+    setTimeout(function(){
+      RevealModule.init();
+      PinStackModule.recalc();
+      // Notify background module to refresh dark-section cache for new page
+      window.dispatchEvent(new Event('tabchange'));
+    }, 60);
+
+    var mt = document.querySelector('.mtab[data-tab="' + tab + '"]');
+    if(mt) mt.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+  }
+
+  document.querySelectorAll('.stab,.mtab').forEach(function(b){
+    b.addEventListener('click', function(){ switchTo(b.dataset.tab); });
+  });
+
+  updateInd();
+  window.addEventListener('resize', updateInd);
+  window.switchTab = switchTo;
+  window.activeTab = active;
+
+  return { switchTo: switchTo, get active(){ return active; } };
+})();
+
+/* ---------- 9. SCRAMBLE TEXT ----------------------------- */
+var ScrambleModule = (function(){
+  var chars = '0123456789ABCDEF';
+  document.querySelectorAll('.scramble').forEach(function(el){
+    var orig = el.dataset.text;
+    el.parentElement.addEventListener('mouseenter', function(){
+      var i = 0;
+      var iv = setInterval(function(){
+        el.textContent = orig.split('').map(function(c, j){
+          return j < i ? c : chars[Math.floor(Math.random() * chars.length)];
+        }).join('');
+        i += 0.5;
+        if(i >= orig.length){ clearInterval(iv); el.textContent = orig; }
+      }, 35);
+    });
+  });
+  return {};
+})();
+
+/* ---------- 10. FORM + TOAST ----------------------------- */
+var FormModule = (function(){
+  var form = document.getElementById('cf');
+  if(!form) return;
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    var t = document.getElementById('toast');
+    t.classList.add('show');
+    e.target.reset();
+    setTimeout(function(){ t.classList.remove('show'); }, 4000);
+  });
+  return {};
+})();
+
+/* ---------- INIT ----------------------------------------- */
+setTimeout(function(){
+  RevealModule.init();
+}, 150);
+</script>
+</body>
+</html>
